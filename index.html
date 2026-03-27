@@ -264,26 +264,26 @@
     /* GRID */
     .periodic-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
       width: 100%;
     }
 
     .periodic-cell {
-      aspect-ratio: 3 / 4;
       border-radius: 8px;
-      padding: 0.75rem;
+      padding: 0.6rem 0.5rem;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       text-align: center;
       border: 1.5px solid;
       position: relative;
       overflow: hidden;
       animation: cellFadeIn 0.3s ease forwards;
+      min-height: 90px;
     }
 
     @keyframes cellFadeIn {
@@ -337,25 +337,63 @@
       pointer-events: none;
     }
 
+    .cell-top-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+      margin-bottom: 0.15rem;
+    }
+
     .cell-rank {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       color: #94a3b8;
       font-weight: 600;
       letter-spacing: 0.03em;
     }
 
+    .cell-score-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.15);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+    }
+
+    .periodic-cell.vertical .cell-score-badge {
+      color: #8b5cf6;
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    .periodic-cell.technology .cell-score-badge {
+      color: #14b8a6;
+      background: rgba(20, 184, 166, 0.15);
+    }
+
     .cell-abbrev {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: #e2e8f0;
       letter-spacing: -0.02em;
-      margin: 0.25rem 0;
+      line-height: 1.1;
+    }
+
+    .cell-name {
+      font-size: 0.55rem;
+      font-weight: 500;
+      color: #94a3b8;
+      line-height: 1.2;
+      margin-top: 0.2rem;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
     }
 
     .cell-score {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #cbd5e1;
+      display: none;
     }
 
     .cell-tooltip {
@@ -1638,17 +1676,20 @@
       }
 
       .periodic-grid {
-        grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
-        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 0.5rem;
       }
 
       .periodic-cell {
-        aspect-ratio: auto;
-        min-height: 65px;
+        min-height: 75px;
       }
 
       .cell-abbrev {
-        font-size: 1.1rem;
+        font-size: 1rem;
+      }
+
+      .cell-name {
+        font-size: 0.5rem;
       }
 
       .rankings-grid {
@@ -1992,6 +2033,11 @@
               <div className="legend-box"></div>
               Core Technologies
             </div>
+            <div className="legend-item" style={{ marginLeft: '1.5rem', borderLeft: '1px solid rgba(71,85,105,0.4)', paddingLeft: '1.5rem' }}>
+              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                Score = weighted composite of ROI, Adoption, Maturity, Readiness, Complexity &amp; Risk (0–100)
+              </span>
+            </div>
           </div>
 
           <div className="periodic-controls">
@@ -2042,16 +2088,19 @@
             animationDelay: `${(index % 20) * 0.03}s`,
           }}
         >
-          <div className="cell-rank">{item.rank}</div>
+          <div className="cell-top-row">
+            <div className="cell-rank">#{item.rank}</div>
+            <div className="cell-score-badge">{item.score}</div>
+          </div>
           <div className="cell-abbrev">{abbrev}</div>
-          <div className="cell-score">{item.score}</div>
+          <div className="cell-name">{item.name}</div>
           <div className="cell-tooltip">
             <div style={{ fontWeight: 600 }}>{item.name}</div>
             <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
               {item.subcategory}
             </div>
             <div style={{ fontSize: '0.7rem', color: '#3b82f6', marginTop: '0.25rem' }}>
-              Score: {item.score}
+              Composite Score: {item.score}/100
             </div>
           </div>
         </div>
