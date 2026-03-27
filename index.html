@@ -1,2035 +1,3157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Use Case Index</title>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- D3.js -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-
-    <!-- React + ReactDOM + Babel -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --color-bg-dark: #0a0f1a;
-            --color-bg-card: #0f141f;
-            --color-bg-hover: #151b2a;
-            --color-text-primary: #e8eef7;
-            --color-text-secondary: #a8b2c1;
-            --color-accent-blue: #3b82f6;
-            --color-accent-purple: #8b5cf6;
-            --color-accent-teal: #14b8a6;
-            --color-accent-orange: #f97316;
-            --color-border: #1e2438;
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-danger: #ef4444;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        html, body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg-dark);
-            color: var(--color-text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        body {
-            overflow-x: hidden;
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--color-bg-dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--color-accent-blue);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--color-accent-purple);
-        }
-
-        /* Layout */
-        .app {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(10, 15, 26, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--color-border);
-            padding: 1rem 2rem;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            white-space: nowrap;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-link {
-            background: none;
-            border: none;
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: var(--transition);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-        }
-
-        .nav-link:hover {
-            color: var(--color-accent-blue);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .nav-link.active {
-            color: var(--color-accent-blue);
-            background: rgba(59, 130, 246, 0.15);
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .hamburger span {
-            width: 24px;
-            height: 2px;
-            background: var(--color-accent-blue);
-            border-radius: 1px;
-            transition: var(--transition);
-        }
-
-        .main-content {
-            flex: 1;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Views */
-        .view {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Rankings View */
-        .rankings-view {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .controls-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .search-box {
-            flex: 1;
-            min-width: 250px;
-            padding: 0.75rem 1rem;
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 6px;
-            color: var(--color-text-primary);
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .search-box:focus {
-            outline: none;
-            border-color: var(--color-accent-blue);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .filter-chips {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .chip {
-            padding: 0.5rem 1rem;
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 20px;
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .chip:hover {
-            border-color: var(--color-accent-blue);
-            color: var(--color-accent-blue);
-        }
-
-        .chip.active {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: var(--color-accent-blue);
-            color: var(--color-accent-blue);
-        }
-
-        .sort-select {
-            padding: 0.75rem 1rem;
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 6px;
-            color: var(--color-text-primary);
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .sort-select:hover {
-            border-color: var(--color-accent-blue);
-        }
-
-        .sort-select:focus {
-            outline: none;
-            border-color: var(--color-accent-blue);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .rankings-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .ranking-item {
-            padding: 1.5rem;
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .ranking-item:hover {
-            border-color: var(--color-accent-blue);
-            background: var(--color-bg-hover);
-            transform: translateX(4px);
-        }
-
-        .ranking-index {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--color-accent-blue);
-            min-width: 60px;
-        }
-
-        .ranking-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .ranking-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--color-text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .ranking-category {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .category-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 4px;
-            font-size: 0.75rem;
-            color: var(--color-accent-blue);
-            font-weight: 500;
-        }
-
-        .category-badge.vertical {
-            background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.3);
-            color: var(--color-accent-purple);
-        }
-
-        .category-badge.technology {
-            background: rgba(20, 184, 166, 0.1);
-            border-color: rgba(20, 184, 166, 0.3);
-            color: var(--color-accent-teal);
-        }
-
-        .ranking-description {
-            font-size: 0.9rem;
-            color: var(--color-text-secondary);
-            line-height: 1.5;
-        }
-
-        .ranking-score {
-            text-align: right;
-            min-width: 120px;
-        }
-
-        .score-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--color-accent-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .score-label {
-            font-size: 0.8rem;
-            color: var(--color-text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Bar Chart */
-        .chart-container {
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 2rem;
-            margin-top: 2rem;
-        }
-
-        .chart-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--color-text-primary);
-        }
-
-        svg {
-            font-family: 'Inter', sans-serif;
-        }
-
-        .bar-chart-bar {
-            fill: url(#barGradient);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .bar-chart-bar:hover {
-            opacity: 0.8;
-            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
-        }
-
-        .bar-chart-label {
-            font-size: 0.85rem;
-            fill: var(--color-text-secondary);
-        }
-
-        .bar-chart-value {
-            font-size: 0.75rem;
-            fill: var(--color-text-primary);
-            font-weight: 600;
-        }
-
-        .axis-line {
-            stroke: var(--color-border);
-            stroke-width: 1;
-        }
-
-        .axis-text {
-            font-size: 0.8rem;
-            fill: var(--color-text-secondary);
-        }
-
-        .grid-line {
-            stroke: var(--color-border);
-            stroke-dasharray: 2,2;
-            opacity: 0.5;
-        }
-
-        /* Category View */
-        .categories-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .category-column {
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 2rem;
-        }
-
-        .category-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: var(--color-text-primary);
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .category-count {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: rgba(59, 130, 246, 0.2);
-            border-radius: 50%;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--color-accent-blue);
-        }
-
-        .subcategories {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .subcategory-item {
-            padding: 1rem;
-            background: rgba(59, 130, 246, 0.05);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .subcategory-item:hover {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: var(--color-accent-blue);
-            transform: translateX(4px);
-        }
-
-        .subcategory-name {
-            font-weight: 500;
-            color: var(--color-text-primary);
-        }
-
-        .subcategory-count {
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-            background: rgba(59, 130, 246, 0.1);
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-        }
-
-        /* Detail Panel */
-        .detail-panel-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1500;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .detail-panel {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 100%;
-            max-width: 500px;
-            height: 100vh;
-            background: var(--color-bg-dark);
-            border-left: 1px solid var(--color-border);
-            z-index: 2000;
-            overflow-y: auto;
-            animation: slideIn 0.3s ease-in-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-            }
-            to {
-                transform: translateX(0);
-            }
-        }
-
-        .panel-header {
-            padding: 2rem;
-            border-bottom: 1px solid var(--color-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .panel-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--color-text-primary);
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--color-text-secondary);
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: var(--transition);
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-btn:hover {
-            color: var(--color-accent-blue);
-        }
-
-        .panel-content {
-            padding: 2rem;
-        }
-
-        .panel-section {
-            margin-bottom: 2rem;
-        }
-
-        .panel-section-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--color-text-primary);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-size: 0.9rem;
-            color: var(--color-accent-blue);
-        }
-
-        .panel-description {
-            font-size: 0.95rem;
-            color: var(--color-text-secondary);
-            line-height: 1.6;
-        }
-
-        .panel-list {
-            list-style: none;
-        }
-
-        .panel-list-item {
-            padding: 0.75rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--color-text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .panel-list-item::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--color-accent-blue);
-            font-weight: 700;
-        }
-
-        .radar-chart-container {
-            margin: 1rem 0;
-        }
-
-        /* Compare View */
-        .compare-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .compare-selector {
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 1.5rem;
-        }
-
-        .compare-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--color-text-primary);
-        }
-
-        .compare-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .compare-item {
-            padding: 1rem;
-            background: var(--color-bg-hover);
-            border: 2px solid var(--color-border);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .compare-item:hover {
-            border-color: var(--color-accent-blue);
-        }
-
-        .compare-item.selected {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: var(--color-accent-blue);
-        }
-
-        .compare-remove {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 0.5rem;
-            width: 100%;
-        }
-
-        .compare-remove:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-
-        .compare-results {
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 2rem;
-        }
-
-        .compare-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .compare-card {
-            background: var(--color-bg-hover);
-            border: 1px solid var(--color-border);
-            border-radius: 6px;
-            padding: 1.5rem;
-        }
-
-        .compare-card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--color-accent-blue);
-            margin-bottom: 1rem;
-        }
-
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2rem;
-        }
-
-        .comparison-table th {
-            text-align: left;
-            padding: 1rem;
-            background: var(--color-bg-hover);
-            border-bottom: 2px solid var(--color-border);
-            color: var(--color-text-primary);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .comparison-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--color-border);
-            color: var(--color-text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .comparison-table tr:hover {
-            background: rgba(59, 130, 246, 0.05);
-        }
-
-        /* Weights Calculator View */
-        .weights-calculator {
-            max-width: 800px;
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 2rem;
-        }
-
-        .methodology {
-            background: rgba(59, 130, 246, 0.05);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 6px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .methodology-title {
-            font-weight: 600;
-            color: var(--color-accent-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .methodology-text {
-            font-size: 0.95rem;
-            color: var(--color-text-secondary);
-            line-height: 1.6;
-        }
-
-        .weight-slider-group {
-            margin-bottom: 2rem;
-        }
-
-        .weight-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .weight-name {
-            font-weight: 600;
-            color: var(--color-text-primary);
-        }
-
-        .weight-value {
-            display: inline-block;
-            min-width: 60px;
-            text-align: right;
-            font-weight: 700;
-            color: var(--color-accent-blue);
-        }
-
-        .weight-slider {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: var(--color-bg-hover);
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .weight-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--color-accent-blue);
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .weight-slider::-webkit-slider-thumb:hover {
-            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3);
-        }
-
-        .weight-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--color-accent-blue);
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .weight-slider::-moz-range-thumb:hover {
-            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3);
-        }
-
-        .weight-total {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: var(--color-bg-hover);
-            border-radius: 6px;
-            margin: 1.5rem 0;
-        }
-
-        .weight-total-label {
-            font-weight: 600;
-            color: var(--color-text-primary);
-        }
-
-        .weight-total-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--color-accent-blue);
-        }
-
-        .reset-weights-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--color-accent-purple);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 1rem;
-        }
-
-        .reset-weights-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-
-        /* Trends/Insights View */
-        .insights-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--color-accent-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--color-text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .distribution-chart {
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 2rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--color-text-secondary);
-        }
-
-        .empty-state-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--color-text-primary);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .categories-container {
-                grid-template-columns: 1fr;
-            }
-
-            .detail-panel {
-                max-width: 400px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .header-content {
-                padding: 0 1rem;
-            }
-
-            .main-content {
-                padding: 1rem;
-            }
-
-            .ranking-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .ranking-score {
-                text-align: left;
-                width: 100%;
-            }
-
-            .detail-panel {
-                max-width: 100%;
-            }
-
-            .controls-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-box,
-            .sort-select {
-                width: 100%;
-            }
-
-            .filter-chips {
-                justify-content: flex-start;
-            }
-
-            .compare-items {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Loading */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem 2rem;
-            color: var(--color-text-secondary);
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--color-border);
-            border-top-color: var(--color-accent-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 1rem;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip-text {
-            visibility: hidden;
-            background-color: var(--color-bg-hover);
-            color: var(--color-text-primary);
-            text-align: center;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -60px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            border: 1px solid var(--color-border);
-        }
-
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Use Case Index 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0a0f1e 0%, #111827 50%, #0f172a 100%);
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    #root {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem;
+      background: rgba(10, 15, 30, 0.7);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      background: rgba(10, 15, 30, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+    }
+
+    .navbar-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .navbar-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      letter-spacing: 0.02em;
+    }
+
+    .navbar-subtitle {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+
+    .navbar-nav {
+      display: flex;
+      gap: 3rem;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-link {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      position: relative;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: inherit;
+      padding: 0.5rem 0;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: #e2e8f0;
+    }
+
+    .nav-link.active {
+      color: #3b82f6;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #3b82f6;
+      border-radius: 1px;
+    }
+
+    .navbar-burger {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .navbar-burger span {
+      width: 24px;
+      height: 2px;
+      background: #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    /* MAIN LAYOUT */
+    .main-container {
+      width: 100%;
+      margin-top: 80px;
+      min-height: calc(100vh - 80px);
+      padding: 2rem 2rem;
+    }
+
+    /* PERIODIC TABLE VIEW */
+    .periodic-view {
+      width: 100%;
+    }
+
+    .periodic-header {
+      margin-bottom: 2rem;
+    }
+
+    .periodic-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .periodic-subtitle {
+      color: #64748b;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .periodic-controls {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+      flex: 1;
+      min-width: 200px;
+      max-width: 400px;
+    }
+
+    .search-input::placeholder {
+      color: #64748b;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: rgba(30, 41, 59, 0.95);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .chip {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 20px;
+      background: rgba(30, 41, 59, 0.8);
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .chip:hover {
+      border-color: rgba(71, 85, 105, 0.6);
+      color: #e2e8f0;
+    }
+
+    .chip.active {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
+
+    .category-legend {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+
+    .legend-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      border: 2px solid currentColor;
+    }
+
+    .legend-item.horizontal .legend-box {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .legend-item.vertical .legend-box {
+      border-color: #8b5cf6;
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    .legend-item.technology .legend-box {
+      border-color: #14b8a6;
+      background: rgba(20, 184, 166, 0.15);
+    }
+
+    /* GRID */
+    .periodic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .periodic-cell {
+      aspect-ratio: 3 / 4;
+      border-radius: 8px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      border: 1.5px solid;
+      position: relative;
+      overflow: hidden;
+      animation: cellFadeIn 0.3s ease forwards;
+    }
+
+    @keyframes cellFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .periodic-cell.horizontal {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .periodic-cell.vertical {
+      background: rgba(139, 92, 246, 0.12);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    .periodic-cell.technology {
+      background: rgba(20, 184, 166, 0.12);
+      border-color: rgba(20, 184, 166, 0.4);
+    }
+
+    .periodic-cell:hover {
+      transform: scale(1.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .periodic-cell.horizontal:hover {
+      border-color: rgba(59, 130, 246, 0.8);
+      background: rgba(59, 130, 246, 0.2);
+    }
+
+    .periodic-cell.vertical:hover {
+      border-color: rgba(139, 92, 246, 0.8);
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    .periodic-cell.technology:hover {
+      border-color: rgba(20, 184, 166, 0.8);
+      background: rgba(20, 184, 166, 0.2);
+    }
+
+    .periodic-cell.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .cell-rank {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .cell-abbrev {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      letter-spacing: -0.02em;
+      margin: 0.25rem 0;
+    }
+
+    .cell-score {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .cell-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(71, 85, 105, 0.6);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      color: #e2e8f0;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .periodic-cell:hover .cell-tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-12px);
+    }
+
+    /* BROWSE VIEW */
+    .browse-view {
+      padding: 6rem 2rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .browse-search-section {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .browse-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 0.5rem;
+    }
+
+    .browse-subtitle {
+      color: #64748b;
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .browse-search-wrapper {
+      position: relative;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .browse-search-icon {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: #64748b;
+    }
+
+    .browse-search-input {
+      width: 100%;
+      padding: 1rem 3rem 1rem 3.5rem;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 12px;
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .browse-search-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .browse-search-input::placeholder {
+      color: #475569;
+    }
+
+    .browse-search-clear {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #64748b;
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .browse-search-clear:hover {
+      color: #e2e8f0;
+    }
+
+    .browse-results-section {
+      margin-bottom: 3rem;
+    }
+
+    .browse-results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .browse-section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .browse-clear-btn {
+      background: none;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      color: #94a3b8;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .browse-clear-btn:hover {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .browse-results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .browse-result-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .browse-result-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .browse-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .browse-card-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .browse-card-score {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #3b82f6;
+    }
+
+    .browse-card-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 0.5rem;
+    }
+
+    .browse-card-desc {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .browse-card-meta {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .browse-card-sub, .browse-card-timeline, .browse-card-investment {
+      font-size: 0.75rem;
+      color: #64748b;
+      background: rgba(71, 85, 105, 0.2);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .browse-empty {
+      text-align: center;
+      color: #475569;
+      padding: 3rem;
+      font-size: 1rem;
+    }
+
+    /* Category browsing */
+    .browse-categories-section {
+      margin-bottom: 3rem;
+    }
+
+    .browse-categories-section > .browse-section-title {
+      margin-bottom: 1.5rem;
+    }
+
+    .browse-category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .browse-category-column {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .browse-category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1.5rem;
+      border-left: 4px solid;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .browse-category-header:hover {
+      background: rgba(71, 85, 105, 0.1);
+    }
+
+    .browse-cat-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .browse-cat-desc {
+      font-size: 0.8rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .browse-cat-count {
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+
+    .browse-subcategories {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .browse-subcategories.expanded {
+      max-height: 1000px;
+    }
+
+    .browse-subcategory-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      border-top: 1px solid rgba(71, 85, 105, 0.15);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .browse-subcategory-row:hover {
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .browse-subcategory-row:hover .browse-subcat-arrow {
+      transform: translateX(4px);
+      color: #3b82f6;
+    }
+
+    .browse-subcat-name {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .browse-subcat-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .browse-subcat-count {
+      font-size: 0.8rem;
+      color: #64748b;
+      background: rgba(71, 85, 105, 0.2);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .browse-subcat-arrow {
+      color: #475569;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
+    }
+
+    /* Industries */
+    .browse-industries-section {
+      margin-bottom: 3rem;
+    }
+
+    .browse-industries-section > .browse-section-title {
+      margin-bottom: 1.25rem;
+    }
+
+    .browse-industry-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .browse-industry-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.1rem;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .browse-industry-tag:hover {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #3b82f6;
+    }
+
+    .browse-tag-count {
+      background: rgba(71, 85, 105, 0.3);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    /* RANKINGS VIEW */
+    .rankings-view {
+      width: 100%;
+    }
+
+    .rankings-header {
+      margin-bottom: 2rem;
+    }
+
+    .rankings-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .distribution-chart {
+      width: 100%;
+      height: 120px;
+      margin-bottom: 2rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      position: relative;
+    }
+
+    .distribution-dots {
+      display: flex;
+      align-items: flex-end;
+      height: 100%;
+      justify-content: space-around;
+      gap: 0.5rem;
+    }
+
+    .distribution-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      position: absolute;
+    }
+
+    .distribution-dot:hover {
+      transform: scale(1.5);
+      filter: brightness(1.2);
+    }
+
+    .rankings-controls {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .control-label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .sort-select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 4px;
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sort-select:hover {
+      border-color: rgba(71, 85, 105, 0.6);
+    }
+
+    .sort-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .rankings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .ranking-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .ranking-card:hover {
+      border-color: rgba(71, 85, 105, 0.6);
+      background: rgba(30, 41, 59, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .rank-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .rank-circle.horizontal {
+      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    }
+
+    .rank-circle.vertical {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    }
+
+    .rank-circle.technology {
+      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    }
+
+    .card-score {
+      text-align: right;
+    }
+
+    .card-score-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .card-score-label {
+      font-size: 0.65rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .card-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .card-subcategory {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .card-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge.category {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
+
+    .badge.category.vertical {
+      background: rgba(139, 92, 246, 0.15);
+      color: #8b5cf6;
+    }
+
+    .badge.category.technology {
+      background: rgba(20, 184, 166, 0.15);
+      color: #14b8a6;
+    }
+
+    .card-chart {
+      width: 100%;
+      height: 30px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 4px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-small {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 4px;
+      background: rgba(30, 41, 59, 0.5);
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      border: none;
+    }
+
+    .btn-small:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    /* COMPARE VIEW */
+    .compare-view {
+      width: 100%;
+    }
+
+    .compare-header {
+      margin-bottom: 2rem;
+    }
+
+    .compare-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .compare-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .radar-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 8px;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .radar-chart {
+      width: 100%;
+      height: 500px;
+    }
+
+    .compare-selectors {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .selector {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .selector-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .selector-input {
+      padding: 0.75rem;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 4px;
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .selector-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .comparison-table th {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    }
+
+    .comparison-table td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+      font-size: 0.875rem;
+    }
+
+    .comparison-table tr:hover {
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    /* WEIGHTS VIEW */
+    .weights-view {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .weights-header {
+      margin-bottom: 2rem;
+    }
+
+    .weights-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .weights-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .weights-panel {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 8px;
+      padding: 2rem;
+    }
+
+    .weight-control {
+      margin-bottom: 2rem;
+    }
+
+    .weight-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .weight-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .weight-value {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #3b82f6;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(71, 85, 105, 0.3);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      background: #60a5fa;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .slider::-moz-range-thumb:hover {
+      background: #60a5fa;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
+    }
+
+    .weights-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+      color: white;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 6px;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(71, 85, 105, 0.6);
+      color: #e2e8f0;
+    }
+
+    .top-10-list {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 8px;
+      padding: 2rem;
+    }
+
+    .top-10-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #e2e8f0;
+    }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .rank-item:last-child {
+      border-bottom: none;
+    }
+
+    .rank-item:hover {
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    .rank-number {
+      min-width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+
+    .rank-info {
+      flex: 1;
+    }
+
+    .rank-info-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .rank-info-score {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    .rank-score {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #3b82f6;
+      min-width: 50px;
+      text-align: right;
+    }
+
+    /* INSIGHTS VIEW */
+    .insights-view {
+      width: 100%;
+    }
+
+    .insights-header {
+      margin-bottom: 2rem;
+    }
+
+    .insights-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .chart-section {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(71, 85, 105, 0.4);
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #e2e8f0;
+    }
+
+    .bar-chart {
+      width: 100%;
+      height: 300px;
+    }
+
+    /* DETAIL PANEL */
+    .detail-panel-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .detail-panel-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .detail-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%;
+      max-width: 500px;
+      height: 100vh;
+      background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+      border-left: 1px solid rgba(71, 85, 105, 0.4);
+      z-index: 2000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-panel.open {
+      transform: translateX(0);
+    }
+
+    .detail-header {
+      padding: 2rem;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .detail-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2e8f0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-close:hover {
+      background: rgba(30, 41, 59, 0.95);
+      color: #3b82f6;
+    }
+
+    .detail-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 0.75rem;
+      padding-right: 40px;
+    }
+
+    .detail-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .detail-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .detail-section {
+      margin-bottom: 2rem;
+    }
+
+    .detail-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .detail-chart {
+      width: 100%;
+      height: 250px;
+      margin-bottom: 1rem;
+    }
+
+    .score-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .score-bar-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      min-width: 60px;
+      font-weight: 600;
+    }
+
+    .score-bar-value {
+      width: 100%;
+      height: 8px;
+      background: rgba(71, 85, 105, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .score-bar-number {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      min-width: 35px;
+      text-align: right;
+    }
+
+    .detail-list {
+      list-style: none;
+    }
+
+    .detail-list li {
+      padding: 0.75rem 0;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .detail-list li:last-child {
+      border-bottom: none;
+    }
+
+    .detail-list li::before {
+      content: '→';
+      color: #3b82f6;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .detail-text {
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* LOADING ANIMATION */
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 60vh;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .navbar-nav {
+        display: none;
+      }
+
+      .navbar-burger {
+        display: flex;
+      }
+
+      .weights-container {
+        grid-template-columns: 1fr;
+      }
+
+      .rankings-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+
+      .detail-panel {
+        max-width: 100%;
+      }
+
+      .periodic-grid {
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        margin-top: 70px;
+        padding: 1rem;
+      }
+
+      .navbar {
+        padding: 1rem;
+      }
+
+      .periodic-title,
+      .rankings-title,
+      .compare-title,
+      .weights-title,
+      .insights-title {
+        font-size: 1.8rem;
+      }
+
+      .category-legend {
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .periodic-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-input {
+        max-width: none;
+      }
+
+      .filter-chips {
+        width: 100%;
+      }
+
+      .periodic-grid {
+        grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .periodic-cell {
+        aspect-ratio: auto;
+        min-height: 65px;
+      }
+
+      .cell-abbrev {
+        font-size: 1.1rem;
+      }
+
+      .rankings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .compare-selectors {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .radar-container {
+        max-width: 100%;
+      }
+
+      .detail-panel {
+        max-width: 100%;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.4);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 0.6);
+    }
+  </style>
 </head>
 <body>
-    <div id="root"></div>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo } = React;
 
-        // Configuration
-        const CONFIG = {
-            dataPath: 'data/use-cases.json',
-            defaultWeights: {
-                roi: 0.25,
-                complexity: 0.15,
-                maturity: 0.20,
-                risk: 0.10,
-                adoption: 0.15,
-                readiness: 0.15
-            }
+    // UTILITY FUNCTIONS
+    const generateAbbrev = (name) => {
+      const words = name.split(/\s+/).filter(w => !['and', 'of', 'the', 'ai', '&'].includes(w.toLowerCase()));
+      if (words.length > 1) {
+        return words.slice(0, 3).map(w => w[0].toUpperCase()).join('');
+      } else {
+        return words[0].substring(0, 3).toUpperCase();
+      }
+    };
+
+    const calculateCompositeScore = (scores, weights) => {
+      const baseWeights = {
+        roi: 0.25,
+        complexity: 0.15,
+        maturity: 0.20,
+        risk: 0.10,
+        adoption: 0.15,
+        readiness: 0.15,
+      };
+
+      const w = weights || baseWeights;
+      const score =
+        scores.roi * w.roi +
+        (100 - scores.complexity) * w.complexity +
+        scores.maturity * w.maturity +
+        (100 - scores.risk) * w.risk +
+        scores.adoption * w.adoption +
+        scores.readiness * w.readiness;
+
+      return Math.round(score);
+    };
+
+    const getCategoryColor = (category) => {
+      if (category === 'Horizontal') return '#3b82f6';
+      if (category === 'Vertical') return '#8b5cf6';
+      return '#14b8a6';
+    };
+
+    // MAIN APP
+    function App() {
+      const [data, setData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [activeView, setActiveView] = useState('periodic');
+      const [selectedUseCase, setSelectedUseCase] = useState(null);
+      const [search, setSearch] = useState('');
+      const [categoryFilter, setCategoryFilter] = useState('ALL');
+      const [sortBy, setSortBy] = useState('rank');
+      const [weights, setWeights] = useState({
+        roi: 0.25,
+        complexity: 0.15,
+        maturity: 0.20,
+        risk: 0.10,
+        adoption: 0.15,
+        readiness: 0.15,
+      });
+      const [compareIds, setCompareIds] = useState([]);
+      const [scrolled, setScrolled] = useState(false);
+
+      // Load data
+      useEffect(() => {
+        const loadData = async () => {
+          try {
+            const response = await fetch('./data/use-cases.json');
+            const json = await response.json();
+            setData(json);
+          } catch (error) {
+            console.error('Error loading data:', error);
+            setData([]);
+          } finally {
+            setLoading(false);
+          }
         };
 
-        // Utility Functions
-        const calculateCompositeScore = (useCase, weights) => {
-            const complexity = 100 - useCase.scores.complexity;
-            const risk = 100 - useCase.scores.risk;
+        loadData();
+      }, []);
 
-            return (
-                useCase.scores.roi * weights.roi +
-                complexity * weights.complexity +
-                useCase.scores.maturity * weights.maturity +
-                risk * weights.risk +
-                useCase.scores.adoption * weights.adoption +
-                useCase.scores.readiness * weights.readiness
-            );
+      // Scroll listener for navbar effect
+      useEffect(() => {
+        const handleScroll = () => {
+          setScrolled(window.scrollY > 10);
         };
 
-        // Main App Component
-        const App = () => {
-            const [currentView, setCurrentView] = useState('rankings');
-            const [useCases, setUseCases] = useState([]);
-            const [loading, setLoading] = useState(true);
-            const [error, setError] = useState(null);
-            const [searchQuery, setSearchQuery] = useState('');
-            const [filterCategory, setFilterCategory] = useState('all');
-            const [sortBy, setSortBy] = useState('composite');
-            const [selectedUseCase, setSelectedUseCase] = useState(null);
-            const [weights, setWeights] = useState(CONFIG.defaultWeights);
-            const [compareSelected, setCompareSelected] = useState([]);
-            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+      }, []);
 
-            // Load data
-            useEffect(() => {
-                const loadData = async () => {
-                    try {
-                        const response = await fetch(CONFIG.dataPath);
-                        if (!response.ok) throw new Error('Failed to load data');
-                        const data = await response.json();
-                        setUseCases(data);
-                    } catch (err) {
-                        setError(err.message);
-                    } finally {
-                        setLoading(false);
-                    }
-                };
-                loadData();
-            }, []);
+      // Filter and sort data
+      const filteredData = useMemo(() => {
+        if (!data) return [];
 
-            // Filter and sort use cases
-            const filteredUseCases = useCases.filter(uc => {
-                const matchesSearch = !searchQuery ||
-                    uc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    uc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    uc.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    uc.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    (uc.industry && uc.industry.some(ind => ind.toLowerCase().includes(searchQuery.toLowerCase())));
+        let filtered = [...data];
 
-                const matchesFilter = filterCategory === 'all' || uc.category.toLowerCase() === filterCategory.toLowerCase();
+        // Filter by search — deep search across all key fields
+        if (search) {
+          const lowerSearch = search.toLowerCase();
+          filtered = filtered.filter(
+            (item) =>
+              item.name.toLowerCase().includes(lowerSearch) ||
+              item.description.toLowerCase().includes(lowerSearch) ||
+              item.subcategory.toLowerCase().includes(lowerSearch) ||
+              item.category.toLowerCase().includes(lowerSearch) ||
+              (item.industry && item.industry.some(ind => ind.toLowerCase().includes(lowerSearch))) ||
+              (item.howItWorks && item.howItWorks.toLowerCase().includes(lowerSearch)) ||
+              (item.keyBenefits && item.keyBenefits.some(b => b.toLowerCase().includes(lowerSearch)))
+          );
+        }
 
-                return matchesSearch && matchesFilter;
+        // Filter by category
+        if (categoryFilter !== 'ALL') {
+          filtered = filtered.filter((item) => item.category === categoryFilter);
+        }
+
+        // Calculate scores and sort
+        filtered = filtered.map((item, idx) => ({
+          ...item,
+          score: calculateCompositeScore(item.scores, weights),
+          rank: idx + 1,
+        }));
+
+        if (sortBy === 'rank') {
+          filtered.sort((a, b) => b.score - a.score);
+        } else if (sortBy === 'name') {
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        // Update rank after sorting
+        filtered = filtered.map((item, idx) => ({
+          ...item,
+          rank: idx + 1,
+        }));
+
+        return filtered;
+      }, [data, search, categoryFilter, sortBy, weights]);
+
+      if (loading) {
+        return (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+          </div>
+        );
+      }
+
+      return (
+        <>
+          <Navbar
+            activeView={activeView}
+            onViewChange={setActiveView}
+            scrolled={scrolled}
+          />
+
+          <div className="main-container">
+            {activeView === 'periodic' && (
+              <PeriodicView
+                data={filteredData}
+                search={search}
+                onSearch={setSearch}
+                categoryFilter={categoryFilter}
+                onCategoryFilter={setCategoryFilter}
+                onSelectUseCase={setSelectedUseCase}
+              />
+            )}
+
+            {activeView === 'browse' && (
+              <BrowseView
+                data={data || []}
+                weights={weights}
+                search={search}
+                onSearch={setSearch}
+                onSelectUseCase={setSelectedUseCase}
+                onViewChange={setActiveView}
+                onCategoryFilter={setCategoryFilter}
+              />
+            )}
+
+            {activeView === 'rankings' && (
+              <RankingsView
+                data={filteredData}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+                categoryFilter={categoryFilter}
+                onCategoryFilter={setCategoryFilter}
+                onSelectUseCase={setSelectedUseCase}
+              />
+            )}
+
+            {activeView === 'compare' && (
+              <CompareView
+                data={data || []}
+                compareIds={compareIds}
+                onCompareChange={setCompareIds}
+                weights={weights}
+              />
+            )}
+
+            {activeView === 'weights' && (
+              <WeightsView
+                weights={weights}
+                onWeightsChange={setWeights}
+                data={filteredData}
+              />
+            )}
+
+            {activeView === 'insights' && (
+              <InsightsView data={data || []} weights={weights} />
+            )}
+          </div>
+
+          <DetailPanel
+            useCase={selectedUseCase}
+            onClose={() => setSelectedUseCase(null)}
+            weights={weights}
+          />
+        </>
+      );
+    }
+
+    // NAVBAR
+    function Navbar({ activeView, onViewChange, scrolled }) {
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+      const views = [
+        { id: 'periodic', label: 'Periodic Table' },
+        { id: 'browse', label: 'Browse' },
+        { id: 'rankings', label: 'Rankings' },
+        { id: 'compare', label: 'Compare' },
+        { id: 'weights', label: 'Weights' },
+        { id: 'insights', label: 'Insights' },
+      ];
+
+      return (
+        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+          <div className="navbar-brand">
+            <div className="navbar-title">AI USE CASE INDEX</div>
+            <div className="navbar-subtitle">2026 EDITION</div>
+          </div>
+
+          <div className="navbar-nav">
+            {views.map((view) => (
+              <button
+                key={view.id}
+                className={`nav-link ${activeView === view.id ? 'active' : ''}`}
+                onClick={() => {
+                  onViewChange(view.id);
+                  setMobileMenuOpen(false);
+                }}
+              >
+                {view.label}
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="navbar-burger"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </nav>
+      );
+    }
+
+    // PERIODIC VIEW
+    function PeriodicView({
+      data,
+      search,
+      onSearch,
+      categoryFilter,
+      onCategoryFilter,
+      onSelectUseCase,
+    }) {
+      return (
+        <div className="periodic-view">
+          <div className="periodic-header">
+            <h1 className="periodic-title">Periodic Table of AI Use Cases</h1>
+            <p className="periodic-subtitle">
+              Explore 75+ AI use cases organized by category and maturity
+            </p>
+          </div>
+
+          <div className="category-legend">
+            <div className="legend-item horizontal">
+              <div className="legend-box"></div>
+              Horizontal Solutions
+            </div>
+            <div className="legend-item vertical">
+              <div className="legend-box"></div>
+              Vertical Solutions
+            </div>
+            <div className="legend-item technology">
+              <div className="legend-box"></div>
+              Core Technologies
+            </div>
+          </div>
+
+          <div className="periodic-controls">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search use cases..."
+              value={search}
+              onChange={(e) => onSearch(e.target.value)}
+            />
+
+            <div className="filter-chips">
+              {['ALL', 'Horizontal', 'Vertical', 'Technology'].map((cat) => (
+                <button
+                  key={cat}
+                  className={`chip ${categoryFilter === cat ? 'active' : ''}`}
+                  onClick={() => onCategoryFilter(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="periodic-grid">
+            {data.map((item, idx) => (
+              <PeriodicCell
+                key={item.id}
+                item={item}
+                index={idx}
+                onClick={() => onSelectUseCase(item)}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function PeriodicCell({ item, index, onClick }) {
+      const abbrev = generateAbbrev(item.name);
+      const categoryClass = item.category.toLowerCase();
+
+      return (
+        <div
+          className={`periodic-cell ${categoryClass}`}
+          onClick={onClick}
+          style={{
+            animationDelay: `${(index % 20) * 0.03}s`,
+          }}
+        >
+          <div className="cell-rank">{item.rank}</div>
+          <div className="cell-abbrev">{abbrev}</div>
+          <div className="cell-score">{item.score}</div>
+          <div className="cell-tooltip">
+            <div style={{ fontWeight: 600 }}>{item.name}</div>
+            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+              {item.subcategory}
+            </div>
+            <div style={{ fontSize: '0.7rem', color: '#3b82f6', marginTop: '0.25rem' }}>
+              Score: {item.score}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // BROWSE VIEW — category/subcategory/industry navigation with deep search
+    function BrowseView({ data, weights, search, onSearch, onSelectUseCase, onViewChange, onCategoryFilter }) {
+      const [browseSearch, setBrowseSearch] = useState(search || '');
+      const [expandedCategory, setExpandedCategory] = useState(null);
+      const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+      const [selectedIndustry, setSelectedIndustry] = useState(null);
+
+      // Build category → subcategory → use cases tree
+      const categoryTree = useMemo(() => {
+        const tree = {};
+        data.forEach(item => {
+          if (!tree[item.category]) tree[item.category] = {};
+          if (!tree[item.category][item.subcategory]) tree[item.category][item.subcategory] = [];
+          tree[item.category][item.subcategory].push({
+            ...item,
+            score: calculateCompositeScore(item.scores, weights)
+          });
+        });
+        // Sort each subcategory by score
+        Object.values(tree).forEach(subcats => {
+          Object.keys(subcats).forEach(key => {
+            subcats[key].sort((a, b) => b.score - a.score);
+          });
+        });
+        return tree;
+      }, [data, weights]);
+
+      // Build industry list
+      const industries = useMemo(() => {
+        const indMap = {};
+        data.forEach(item => {
+          if (item.industry) {
+            item.industry.forEach(ind => {
+              if (!indMap[ind]) indMap[ind] = 0;
+              indMap[ind]++;
             });
+          }
+        });
+        return Object.entries(indMap).sort((a, b) => b[1] - a[1]);
+      }, [data]);
 
-            const sortedUseCases = [...filteredUseCases].sort((a, b) => {
-                const getScoreValue = (uc, sortKey) => {
-                    if (sortKey === 'composite') return calculateCompositeScore(uc, weights);
-                    return uc.scores[sortKey] || 0;
-                };
+      // Filtered results for search
+      const searchResults = useMemo(() => {
+        if (!browseSearch) return null;
+        const lower = browseSearch.toLowerCase();
+        return data.filter(item =>
+          item.name.toLowerCase().includes(lower) ||
+          item.description.toLowerCase().includes(lower) ||
+          item.subcategory.toLowerCase().includes(lower) ||
+          (item.industry && item.industry.some(i => i.toLowerCase().includes(lower))) ||
+          (item.howItWorks && item.howItWorks.toLowerCase().includes(lower)) ||
+          (item.keyBenefits && item.keyBenefits.some(b => b.toLowerCase().includes(lower)))
+        ).map(item => ({
+          ...item,
+          score: calculateCompositeScore(item.scores, weights)
+        })).sort((a, b) => b.score - a.score);
+      }, [browseSearch, data, weights]);
 
-                return getScoreValue(b, sortBy) - getScoreValue(a, sortBy);
-            });
+      // Use cases filtered by selected industry
+      const industryResults = useMemo(() => {
+        if (!selectedIndustry) return null;
+        return data.filter(item =>
+          item.industry && item.industry.includes(selectedIndustry)
+        ).map(item => ({
+          ...item,
+          score: calculateCompositeScore(item.scores, weights)
+        })).sort((a, b) => b.score - a.score);
+      }, [selectedIndustry, data, weights]);
 
-            const categoryStats = {
-                horizontal: useCases.filter(uc => uc.category.toLowerCase() === 'horizontal').length,
-                vertical: useCases.filter(uc => uc.category.toLowerCase() === 'vertical').length,
-                technology: useCases.filter(uc => uc.category.toLowerCase() === 'technology').length
-            };
+      const categoryColors = {
+        Horizontal: '#3b82f6',
+        Vertical: '#8b5cf6',
+        Technology: '#14b8a6'
+      };
 
-            return (
-                <div className="app">
-                    <Header
-                        currentView={currentView}
-                        onNavigate={(view) => {
-                            setCurrentView(view);
-                            setMobileMenuOpen(false);
-                            setSelectedUseCase(null);
-                        }}
-                        mobileMenuOpen={mobileMenuOpen}
-                        onToggleMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    />
+      const categoryDescriptions = {
+        Horizontal: 'Cross-industry solutions applicable across multiple business functions and domains',
+        Vertical: 'Industry-specific AI applications tailored to particular sectors and use cases',
+        Technology: 'Core AI/ML technology capabilities and emerging paradigms powering enterprise solutions'
+      };
 
-                    <main className="main-content">
-                        {loading ? (
-                            <div className="loading">
-                                <div className="spinner"></div>
-                                <span>Loading use cases...</span>
-                            </div>
-                        ) : error ? (
-                            <div className="empty-state">
-                                <div className="empty-state-title">Error Loading Data</div>
-                                <p>{error}</p>
-                            </div>
-                        ) : (
-                            <>
-                                {currentView === 'rankings' && (
-                                    <RankingsView
-                                        useCases={sortedUseCases}
-                                        searchQuery={searchQuery}
-                                        onSearchChange={setSearchQuery}
-                                        filterCategory={filterCategory}
-                                        onFilterChange={setFilterCategory}
-                                        sortBy={sortBy}
-                                        onSortChange={setSortBy}
-                                        onSelectUseCase={setSelectedUseCase}
-                                        weights={weights}
-                                    />
-                                )}
-                                {currentView === 'categories' && (
-                                    <CategoriesView
-                                        useCases={useCases}
-                                        categoryStats={categoryStats}
-                                        onSelectCategory={(cat) => {
-                                            setFilterCategory(cat);
-                                            setCurrentView('rankings');
-                                        }}
-                                    />
-                                )}
-                                {currentView === 'compare' && (
-                                    <CompareView
-                                        useCases={useCases}
-                                        selected={compareSelected}
-                                        onToggleSelect={(uc) => {
-                                            if (compareSelected.find(s => s.id === uc.id)) {
-                                                setCompareSelected(compareSelected.filter(s => s.id !== uc.id));
-                                            } else if (compareSelected.length < 4) {
-                                                setCompareSelected([...compareSelected, uc]);
-                                            }
-                                        }}
-                                        weights={weights}
-                                    />
-                                )}
-                                {currentView === 'weights' && (
-                                    <WeightsCalculatorView
-                                        weights={weights}
-                                        onWeightsChange={setWeights}
-                                        onReset={() => setWeights(CONFIG.defaultWeights)}
-                                    />
-                                )}
-                                {currentView === 'insights' && (
-                                    <InsightsView
-                                        useCases={useCases}
-                                        categoryStats={categoryStats}
-                                        weights={weights}
-                                    />
-                                )}
-                            </>
-                        )}
-                    </main>
+      return (
+        <div className="browse-view">
+          {/* Search bar — prominent at top */}
+          <div className="browse-search-section">
+            <h1 className="browse-title">Browse & Search</h1>
+            <p className="browse-subtitle">Explore AI use cases by category, industry, or search across all fields</p>
+            <div className="browse-search-wrapper">
+              <svg className="browse-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="M21 21l-4.35-4.35"></path>
+              </svg>
+              <input
+                type="text"
+                className="browse-search-input"
+                placeholder="Search by name, description, industry, technology, benefits..."
+                value={browseSearch}
+                onChange={(e) => {
+                  setBrowseSearch(e.target.value);
+                  setSelectedSubcategory(null);
+                  setSelectedIndustry(null);
+                }}
+              />
+              {browseSearch && (
+                <button className="browse-search-clear" onClick={() => setBrowseSearch('')}>×</button>
+              )}
+            </div>
+          </div>
 
-                    {selectedUseCase && (
-                        <DetailPanel
-                            useCase={selectedUseCase}
-                            onClose={() => setSelectedUseCase(null)}
-                            weights={weights}
-                        />
-                    )}
-                </div>
-            );
-        };
-
-        // Header Component
-        const Header = ({ currentView, onNavigate, mobileMenuOpen, onToggleMenu }) => {
-            return (
-                <header className="app-header">
-                    <div className="header-content">
-                        <div className="logo">
-                            AI Use Case Index
-                        </div>
-
-                        <nav className="nav-menu">
-                            <button
-                                className={`nav-link ${currentView === 'rankings' ? 'active' : ''}`}
-                                onClick={() => onNavigate('rankings')}
-                            >
-                                Rankings
-                            </button>
-                            <button
-                                className={`nav-link ${currentView === 'categories' ? 'active' : ''}`}
-                                onClick={() => onNavigate('categories')}
-                            >
-                                Categories
-                            </button>
-                            <button
-                                className={`nav-link ${currentView === 'compare' ? 'active' : ''}`}
-                                onClick={() => onNavigate('compare')}
-                            >
-                                Compare
-                            </button>
-                            <button
-                                className={`nav-link ${currentView === 'weights' ? 'active' : ''}`}
-                                onClick={() => onNavigate('weights')}
-                            >
-                                Weights
-                            </button>
-                            <button
-                                className={`nav-link ${currentView === 'insights' ? 'active' : ''}`}
-                                onClick={() => onNavigate('insights')}
-                            >
-                                Insights
-                            </button>
-                        </nav>
-
-                        <button className="hamburger" onClick={onToggleMenu}>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
-
-                        {mobileMenuOpen && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                background: 'var(--color-bg-card)',
-                                borderBottom: '1px solid var(--color-border)',
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}>
-                                <button
-                                    className={`nav-link ${currentView === 'rankings' ? 'active' : ''}`}
-                                    onClick={() => onNavigate('rankings')}
-                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
-                                >
-                                    Rankings
-                                </button>
-                                <button
-                                    className={`nav-link ${currentView === 'categories' ? 'active' : ''}`}
-                                    onClick={() => onNavigate('categories')}
-                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
-                                >
-                                    Categories
-                                </button>
-                                <button
-                                    className={`nav-link ${currentView === 'compare' ? 'active' : ''}`}
-                                    onClick={() => onNavigate('compare')}
-                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
-                                >
-                                    Compare
-                                </button>
-                                <button
-                                    className={`nav-link ${currentView === 'weights' ? 'active' : ''}`}
-                                    onClick={() => onNavigate('weights')}
-                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
-                                >
-                                    Weights
-                                </button>
-                                <button
-                                    className={`nav-link ${currentView === 'insights' ? 'active' : ''}`}
-                                    onClick={() => onNavigate('insights')}
-                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
-                                >
-                                    Insights
-                                </button>
-                            </div>
-                        )}
+          {/* Search Results */}
+          {searchResults && (
+            <div className="browse-results-section">
+              <div className="browse-results-header">
+                <h2 className="browse-section-title">{searchResults.length} result{searchResults.length !== 1 ? 's' : ''} for "{browseSearch}"</h2>
+                <button className="browse-clear-btn" onClick={() => setBrowseSearch('')}>Clear search</button>
+              </div>
+              <div className="browse-results-grid">
+                {searchResults.map(item => (
+                  <div key={item.id} className="browse-result-card" onClick={() => onSelectUseCase(item)}>
+                    <div className="browse-card-header">
+                      <span className="browse-card-badge" style={{ background: `${categoryColors[item.category]}22`, color: categoryColors[item.category], border: `1px solid ${categoryColors[item.category]}44` }}>
+                        {item.category}
+                      </span>
+                      <span className="browse-card-score">{item.score.toFixed(1)}</span>
                     </div>
-                </header>
-            );
-        };
+                    <h3 className="browse-card-name">{item.name}</h3>
+                    <p className="browse-card-desc">{item.description}</p>
+                    <div className="browse-card-meta">
+                      <span className="browse-card-sub">{item.subcategory}</span>
+                      {item.timeline && <span className="browse-card-timeline">{item.timeline}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {searchResults.length === 0 && (
+                <div className="browse-empty">No use cases match your search. Try different keywords.</div>
+              )}
+            </div>
+          )}
 
-        // Rankings View
-        const RankingsView = ({ useCases, searchQuery, onSearchChange, filterCategory, onFilterChange, sortBy, onSortChange, onSelectUseCase, weights }) => {
-            const chartRef = useRef(null);
+          {/* Industry filter results */}
+          {!searchResults && selectedIndustry && industryResults && (
+            <div className="browse-results-section">
+              <div className="browse-results-header">
+                <h2 className="browse-section-title">{selectedIndustry} — {industryResults.length} use case{industryResults.length !== 1 ? 's' : ''}</h2>
+                <button className="browse-clear-btn" onClick={() => setSelectedIndustry(null)}>← Back to browse</button>
+              </div>
+              <div className="browse-results-grid">
+                {industryResults.map(item => (
+                  <div key={item.id} className="browse-result-card" onClick={() => onSelectUseCase(item)}>
+                    <div className="browse-card-header">
+                      <span className="browse-card-badge" style={{ background: `${categoryColors[item.category]}22`, color: categoryColors[item.category], border: `1px solid ${categoryColors[item.category]}44` }}>
+                        {item.category}
+                      </span>
+                      <span className="browse-card-score">{item.score.toFixed(1)}</span>
+                    </div>
+                    <h3 className="browse-card-name">{item.name}</h3>
+                    <p className="browse-card-desc">{item.description}</p>
+                    <div className="browse-card-meta">
+                      <span className="browse-card-sub">{item.subcategory}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-            useEffect(() => {
-                if (chartRef.current && useCases.length > 0) {
-                    drawBarChart(chartRef.current, useCases, weights, onSelectUseCase);
-                }
-            }, [useCases, weights, onSelectUseCase]);
+          {/* Subcategory drill-down results */}
+          {!searchResults && !selectedIndustry && selectedSubcategory && (
+            <div className="browse-results-section">
+              <div className="browse-results-header">
+                <h2 className="browse-section-title">{selectedSubcategory.name} — {selectedSubcategory.items.length} use case{selectedSubcategory.items.length !== 1 ? 's' : ''}</h2>
+                <button className="browse-clear-btn" onClick={() => setSelectedSubcategory(null)}>← Back to browse</button>
+              </div>
+              <div className="browse-results-grid">
+                {selectedSubcategory.items.map(item => (
+                  <div key={item.id} className="browse-result-card" onClick={() => onSelectUseCase(item)}>
+                    <div className="browse-card-header">
+                      <span className="browse-card-badge" style={{ background: `${categoryColors[item.category]}22`, color: categoryColors[item.category], border: `1px solid ${categoryColors[item.category]}44` }}>
+                        {item.category}
+                      </span>
+                      <span className="browse-card-score">{item.score.toFixed(1)}</span>
+                    </div>
+                    <h3 className="browse-card-name">{item.name}</h3>
+                    <p className="browse-card-desc">{item.description}</p>
+                    <div className="browse-card-meta">
+                      {item.timeline && <span className="browse-card-timeline">{item.timeline}</span>}
+                      <span className="browse-card-investment">{item.investmentLevel}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-            return (
-                <div className="view rankings-view">
-                    <div className="controls-bar">
-                        <input
-                            type="text"
-                            className="search-box"
-                            placeholder="Search use cases..."
-                            value={searchQuery}
-                            onChange={(e) => onSearchChange(e.target.value)}
-                        />
-                        <div className="filter-chips">
-                            {['All', 'Horizontal', 'Vertical', 'Technology'].map(cat => (
-                                <button
-                                    key={cat}
-                                    className={`chip ${filterCategory === (cat === 'All' ? 'all' : cat.toLowerCase()) ? 'active' : ''}`}
-                                    onClick={() => onFilterChange(cat === 'All' ? 'all' : cat.toLowerCase())}
-                                >
-                                    {cat}
-                                </button>
-                            ))}
-                        </div>
-                        <select
-                            className="sort-select"
-                            value={sortBy}
-                            onChange={(e) => onSortChange(e.target.value)}
+          {/* Default browse: categories + industries */}
+          {!searchResults && !selectedIndustry && !selectedSubcategory && (
+            <>
+              {/* Category columns */}
+              <div className="browse-categories-section">
+                <h2 className="browse-section-title">Browse by Category</h2>
+                <div className="browse-category-grid">
+                  {Object.entries(categoryTree).map(([category, subcats]) => {
+                    const isExpanded = expandedCategory === category;
+                    const totalCount = Object.values(subcats).reduce((sum, arr) => sum + arr.length, 0);
+                    const subcatEntries = Object.entries(subcats).sort((a, b) => a[0].localeCompare(b[0]));
+
+                    return (
+                      <div key={category} className="browse-category-column">
+                        <div
+                          className="browse-category-header"
+                          style={{ borderLeftColor: categoryColors[category] }}
+                          onClick={() => setExpandedCategory(isExpanded ? null : category)}
                         >
-                            <option value="composite">Composite Score</option>
-                            <option value="roi">ROI</option>
-                            <option value="maturity">Maturity</option>
-                            <option value="adoption">Adoption</option>
-                            <option value="readiness">Readiness</option>
-                        </select>
-                    </div>
-
-                    {useCases.length === 0 ? (
-                        <div className="empty-state">
-                            <div className="empty-state-title">No use cases found</div>
-                            <p>Try adjusting your filters or search query</p>
+                          <div>
+                            <h3 className="browse-cat-name" style={{ color: categoryColors[category] }}>{category}</h3>
+                            <p className="browse-cat-desc">{categoryDescriptions[category]}</p>
+                          </div>
+                          <span className="browse-cat-count" style={{ background: `${categoryColors[category]}22`, color: categoryColors[category] }}>{totalCount}</span>
                         </div>
-                    ) : (
-                        <>
-                            <div className="rankings-container">
-                                {useCases.map((uc, idx) => (
-                                    <RankingItem
-                                        key={uc.id}
-                                        index={idx + 1}
-                                        useCase={uc}
-                                        score={calculateCompositeScore(uc, weights)}
-                                        onClick={() => onSelectUseCase(uc)}
-                                    />
-                                ))}
-                            </div>
 
-                            <div className="chart-container">
-                                <h3 className="chart-title">Composite Score Distribution</h3>
-                                <svg ref={chartRef} style={{ width: '100%', height: '400px' }}></svg>
+                        <div className={`browse-subcategories ${isExpanded || !expandedCategory ? 'expanded' : ''}`}>
+                          {subcatEntries.map(([subcat, items]) => (
+                            <div
+                              key={subcat}
+                              className="browse-subcategory-row"
+                              onClick={() => setSelectedSubcategory({ name: subcat, items })}
+                            >
+                              <span className="browse-subcat-name">{subcat}</span>
+                              <div className="browse-subcat-right">
+                                <span className="browse-subcat-count">{items.length}</span>
+                                <span className="browse-subcat-arrow">→</span>
+                              </div>
                             </div>
-                        </>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Industry tags */}
+              <div className="browse-industries-section">
+                <h2 className="browse-section-title">Browse by Industry</h2>
+                <div className="browse-industry-tags">
+                  {industries.map(([industry, count]) => (
+                    <button
+                      key={industry}
+                      className="browse-industry-tag"
+                      onClick={() => setSelectedIndustry(industry)}
+                    >
+                      {industry}
+                      <span className="browse-tag-count">{count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    // RANKINGS VIEW
+    function RankingsView({
+      data,
+      sortBy,
+      onSortChange,
+      categoryFilter,
+      onCategoryFilter,
+      onSelectUseCase,
+    }) {
+      // Create distribution dots
+      const distributionDots = data.map((item) => ({
+        ...item,
+        color: getCategoryColor(item.category),
+      }));
+
+      return (
+        <div className="rankings-view">
+          <div className="rankings-header">
+            <h1 className="rankings-title">Rankings</h1>
+          </div>
+
+          <div className="distribution-chart">
+            <div className="distribution-dots">
+              {distributionDots.map((item) => (
+                <div
+                  key={item.id}
+                  className="distribution-dot"
+                  style={{
+                    background: item.color,
+                    bottom: '20px',
+                    left: `${(item.score / 100) * 85 + 7.5}%`,
+                  }}
+                  title={item.name}
+                ></div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rankings-controls">
+            <div className="filter-chips">
+              {['ALL', 'Horizontal', 'Vertical', 'Technology'].map((cat) => (
+                <button
+                  key={cat}
+                  className={`chip ${categoryFilter === cat ? 'active' : ''}`}
+                  onClick={() => onCategoryFilter(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="control-group">
+              <label className="control-label">Sort by:</label>
+              <select
+                className="sort-select"
+                value={sortBy}
+                onChange={(e) => onSortChange(e.target.value)}
+              >
+                <option value="rank">Rank</option>
+                <option value="name">Name</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="rankings-grid">
+            {data.map((item) => (
+              <RankingCard
+                key={item.id}
+                item={item}
+                onClick={() => onSelectUseCase(item)}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function RankingCard({ item, onClick }) {
+      const categoryClass = item.category.toLowerCase();
+
+      return (
+        <div className="ranking-card" onClick={onClick}>
+          <div className="card-header">
+            <div className="rank-circle" style={{ background: getCategoryColor(item.category) }}>
+              {item.rank}
+            </div>
+
+            <div className="card-score">
+              <div className="card-score-value">{item.score}</div>
+              <div className="card-score-label">Score</div>
+            </div>
+          </div>
+
+          <div>
+            <div className="card-name">{item.name}</div>
+            <div className="card-subcategory">{item.subcategory}</div>
+          </div>
+
+          <div className="card-badges">
+            <span className={`badge category ${categoryClass}`}>
+              {item.category}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="btn-small" onClick={(e) => e.stopPropagation()}>
+              VIEW DETAILS
+            </button>
+            <button className="btn-small" onClick={(e) => e.stopPropagation()}>
+              COMPARE
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // COMPARE VIEW
+    function CompareView({ data, compareIds, onCompareChange, weights }) {
+      const [selected, setSelected] = useState([null, null]);
+
+      const selectedItems = selected
+        .map((id) => data.find((item) => item.id === id))
+        .filter(Boolean);
+
+      const handleSelect = (index, id) => {
+        const newSelected = [...selected];
+        newSelected[index] = id;
+        setSelected(newSelected);
+      };
+
+      return (
+        <div className="compare-view">
+          <div className="compare-header">
+            <h1 className="compare-title">Compare Use Cases</h1>
+          </div>
+
+          <div className="compare-container">
+            <div className="compare-selectors">
+              {[0, 1].map((idx) => (
+                <div key={idx} className="selector">
+                  <label className="selector-label">Use Case {idx + 1}</label>
+                  <select
+                    className="selector-input"
+                    value={selected[idx] || ''}
+                    onChange={(e) => handleSelect(idx, e.target.value)}
+                  >
+                    <option value="">Select a use case...</option>
+                    {data.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+
+            {selectedItems.length > 0 && (
+              <>
+                <div className="radar-container">
+                  <RadarChart items={selectedItems} />
+                </div>
+
+                <table className="comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      {selectedItems.map((item) => (
+                        <th key={item.id}>{item.name}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {['roi', 'complexity', 'maturity', 'risk', 'adoption', 'readiness'].map(
+                      (metric) => (
+                        <tr key={metric}>
+                          <td style={{ textTransform: 'capitalize' }}>{metric}</td>
+                          {selectedItems.map((item) => (
+                            <td key={item.id}>{item.scores[metric]}</td>
+                          ))}
+                        </tr>
+                      )
                     )}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function RadarChart({ items }) {
+      const svgRef = useRef();
+
+      useEffect(() => {
+        if (!svgRef.current || items.length === 0) return;
+
+        const width = 400;
+        const height = 400;
+        const margin = 60;
+
+        const svg = d3.select(svgRef.current);
+        svg.selectAll('*').remove();
+
+        const g = svg
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', `translate(${width / 2},${height / 2})`);
+
+        const angleSlice = (Math.PI * 2) / 6;
+        const radius = (width - margin * 2) / 2;
+
+        // Draw axes
+        const axisLabels = ['ROI', 'Complexity', 'Maturity', 'Risk', 'Adoption', 'Readiness'];
+        const axes = d3.range(6);
+
+        axes.forEach((d, i) => {
+          const angle = angleSlice * i - Math.PI / 2;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+
+          g.append('line')
+            .attr('x1', 0)
+            .attr('y1', 0)
+            .attr('x2', x)
+            .attr('y2', y)
+            .style('stroke', 'rgba(71, 85, 105, 0.3)')
+            .style('stroke-width', 1);
+
+          g.append('text')
+            .attr('x', Math.cos(angle) * (radius + 30))
+            .attr('y', Math.sin(angle) * (radius + 30))
+            .attr('text-anchor', 'middle')
+            .attr('dy', '0.35em')
+            .style('fill', '#94a3b8')
+            .style('font-size', '12px')
+            .style('font-weight', '500')
+            .text(axisLabels[i]);
+        });
+
+        // Draw circles
+        d3.range(1, 6).forEach((i) => {
+          g.append('circle')
+            .attr('r', (radius / 5) * i)
+            .style('fill', 'none')
+            .style('stroke', 'rgba(71, 85, 105, 0.2)')
+            .style('stroke-width', 1);
+        });
+
+        // Draw data
+        items.forEach((item, itemIdx) => {
+          const color = getCategoryColor(item.category);
+          const values = [
+            item.scores.roi,
+            100 - item.scores.complexity,
+            item.scores.maturity,
+            100 - item.scores.risk,
+            item.scores.adoption,
+            item.scores.readiness,
+          ];
+
+          const points = values.map((value, i) => {
+            const angle = angleSlice * i - Math.PI / 2;
+            const r = (value / 100) * radius;
+            return [Math.cos(angle) * r, Math.sin(angle) * r];
+          });
+
+          // Draw polygon
+          const pathData = points.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`));
+          g.append('path')
+            .attr('fill', color)
+            .attr('fill-opacity', 0.1 + itemIdx * 0.1)
+            .attr('stroke', color)
+            .attr('stroke-width', 2)
+            .attr('stroke-linejoin', 'round')
+            .attr('d', pathData.join(' ') + 'Z');
+
+          // Draw points
+          points.forEach((p) => {
+            g.append('circle')
+              .attr('cx', p[0])
+              .attr('cy', p[1])
+              .attr('r', 4)
+              .attr('fill', color)
+              .attr('stroke', 'rgba(15, 23, 42, 1)')
+              .attr('stroke-width', 2);
+          });
+        });
+      }, [items]);
+
+      return <svg ref={svgRef}></svg>;
+    }
+
+    // WEIGHTS VIEW
+    function WeightsView({ weights, onWeightsChange, data }) {
+      const handleWeightChange = (key, value) => {
+        const newWeights = { ...weights, [key]: parseFloat(value) / 100 };
+        onWeightsChange(newWeights);
+      };
+
+      const handleReset = () => {
+        onWeightsChange({
+          roi: 0.25,
+          complexity: 0.15,
+          maturity: 0.20,
+          risk: 0.10,
+          adoption: 0.15,
+          readiness: 0.15,
+        });
+      };
+
+      const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+
+      // Calculate top 10
+      const top10 = [...data]
+        .map((item) => ({
+          ...item,
+          score: calculateCompositeScore(item.scores, weights),
+        }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+
+      return (
+        <div className="weights-view">
+          <div className="weights-header">
+            <h1 className="weights-title">Weights Calculator</h1>
+            <p style={{ color: '#64748b', marginBottom: '1rem' }}>
+              Adjust the importance of each scoring dimension
+            </p>
+          </div>
+
+          <div className="weights-container">
+            <div className="weights-panel">
+              <div className="weight-control">
+                <div className="weight-label">
+                  <span className="weight-name">ROI</span>
+                  <span className="weight-value">{Math.round(weights.roi * 100)}%</span>
                 </div>
-            );
-        };
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={weights.roi * 100}
+                  onChange={(e) => handleWeightChange('roi', e.target.value)}
+                  className="slider"
+                />
+              </div>
 
-        // Ranking Item Component
-        const RankingItem = ({ index, useCase, score, onClick }) => {
-            return (
-                <div className="ranking-item" onClick={onClick}>
-                    <div className="ranking-index">{index}</div>
-                    <div className="ranking-info">
-                        <div className="ranking-name">{useCase.name}</div>
-                        <div className="ranking-category">
-                            <span className="category-badge">{useCase.category}</span>
-                            <span className="category-badge" style={{
-                                background: 'rgba(139, 92, 246, 0.1)',
-                                borderColor: 'rgba(139, 92, 246, 0.3)',
-                                color: 'var(--color-accent-purple)'
-                            }}>
-                                {useCase.subcategory}
-                            </span>
-                        </div>
-                        <div className="ranking-description">{useCase.description}</div>
-                    </div>
-                    <div className="ranking-score">
-                        <div className="score-value">{score.toFixed(1)}</div>
-                        <div className="score-label">Composite</div>
-                    </div>
+              <div className="weight-control">
+                <div className="weight-label">
+                  <span className="weight-name">Complexity (inverted)</span>
+                  <span className="weight-value">{Math.round(weights.complexity * 100)}%</span>
                 </div>
-            );
-        };
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={weights.complexity * 100}
+                  onChange={(e) => handleWeightChange('complexity', e.target.value)}
+                  className="slider"
+                />
+              </div>
 
-        // Categories View
-        const CategoriesView = ({ useCases, categoryStats, onSelectCategory }) => {
-            const categories = [
-                { name: 'Horizontal', count: categoryStats.horizontal, type: 'horizontal' },
-                { name: 'Vertical', count: categoryStats.vertical, type: 'vertical' },
-                { name: 'Technology', count: categoryStats.technology, type: 'technology' }
-            ];
-
-            const getSubcategories = (category) => {
-                return [...new Set(useCases
-                    .filter(uc => uc.category.toLowerCase() === category.toLowerCase())
-                    .map(uc => uc.subcategory))]
-                    .sort();
-            };
-
-            return (
-                <div className="view">
-                    <div className="categories-container">
-                        {categories.map(cat => (
-                            <div key={cat.type} className="category-column">
-                                <h2 className="category-title">
-                                    {cat.name}
-                                    <span className="category-count">{cat.count}</span>
-                                </h2>
-                                <div className="subcategories">
-                                    {getSubcategories(cat.type).map(subcat => {
-                                        const count = useCases.filter(uc =>
-                                            uc.category.toLowerCase() === cat.type && uc.subcategory === subcat
-                                        ).length;
-                                        return (
-                                            <div
-                                                key={subcat}
-                                                className="subcategory-item"
-                                                onClick={() => onSelectCategory(cat.type)}
-                                            >
-                                                <span className="subcategory-name">{subcat}</span>
-                                                <span className="subcategory-count">{count}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+              <div className="weight-control">
+                <div className="weight-label">
+                  <span className="weight-name">Maturity</span>
+                  <span className="weight-value">{Math.round(weights.maturity * 100)}%</span>
                 </div>
-            );
-        };
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={weights.maturity * 100}
+                  onChange={(e) => handleWeightChange('maturity', e.target.value)}
+                  className="slider"
+                />
+              </div>
 
-        // Detail Panel Component
-        const DetailPanel = ({ useCase, onClose, weights }) => {
-            const radarRef = useRef(null);
-
-            useEffect(() => {
-                if (radarRef.current) {
-                    drawRadarChart(radarRef.current, useCase);
-                }
-            }, [useCase]);
-
-            return (
-                <>
-                    <div className="detail-panel-overlay" onClick={onClose}></div>
-                    <div className="detail-panel">
-                        <div className="panel-header">
-                            <div>
-                                <h2 className="panel-title">{useCase.name}</h2>
-                            </div>
-                            <button className="close-btn" onClick={onClose}>×</button>
-                        </div>
-
-                        <div className="panel-content">
-                            <div className="panel-section">
-                                <div className="panel-description">{useCase.description}</div>
-                            </div>
-
-                            <div className="panel-section">
-                                <div className="panel-section-title">Category</div>
-                                <div className="ranking-category">
-                                    <span className="category-badge">{useCase.category}</span>
-                                    <span className="category-badge" style={{
-                                        background: 'rgba(139, 92, 246, 0.1)',
-                                        borderColor: 'rgba(139, 92, 246, 0.3)',
-                                        color: 'var(--color-accent-purple)'
-                                    }}>
-                                        {useCase.subcategory}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {useCase.industry && useCase.industry.length > 0 && (
-                                <div className="panel-section">
-                                    <div className="panel-section-title">Industries</div>
-                                    <div className="ranking-category">
-                                        {useCase.industry.map(ind => (
-                                            <span key={ind} className="category-badge" style={{
-                                                background: 'rgba(20, 184, 166, 0.1)',
-                                                borderColor: 'rgba(20, 184, 166, 0.3)',
-                                                color: 'var(--color-accent-teal)'
-                                            }}>
-                                                {ind}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="panel-section">
-                                <div className="panel-section-title">Scores</div>
-                                <div className="radar-chart-container">
-                                    <svg ref={radarRef} style={{ width: '100%', height: '250px' }}></svg>
-                                </div>
-                            </div>
-
-                            <div className="panel-section">
-                                <div className="panel-section-title">How It Works</div>
-                                <p className="panel-description">{useCase.howItWorks}</p>
-                            </div>
-
-                            {useCase.businessRequirements && useCase.businessRequirements.length > 0 && (
-                                <div className="panel-section">
-                                    <div className="panel-section-title">Business Requirements</div>
-                                    <ul className="panel-list">
-                                        {useCase.businessRequirements.map((req, idx) => (
-                                            <li key={idx} className="panel-list-item">{req}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {useCase.technicalRequirements && useCase.technicalRequirements.length > 0 && (
-                                <div className="panel-section">
-                                    <div className="panel-section-title">Technical Requirements</div>
-                                    <ul className="panel-list">
-                                        {useCase.technicalRequirements.map((req, idx) => (
-                                            <li key={idx} className="panel-list-item">{req}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {useCase.keyBenefits && useCase.keyBenefits.length > 0 && (
-                                <div className="panel-section">
-                                    <div className="panel-section-title">Key Benefits</div>
-                                    <ul className="panel-list">
-                                        {useCase.keyBenefits.map((benefit, idx) => (
-                                            <li key={idx} className="panel-list-item">{benefit}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {useCase.examples && useCase.examples.length > 0 && (
-                                <div className="panel-section">
-                                    <div className="panel-section-title">Real-World Examples</div>
-                                    <ul className="panel-list">
-                                        {useCase.examples.map((example, idx) => (
-                                            <li key={idx} className="panel-list-item">{example}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-
-                            {useCase.timeline && (
-                                <div className="panel-section">
-                                    <div className="panel-section-title">Timeline</div>
-                                    <p className="panel-description">{useCase.timeline}</p>
-                                </div>
-                            )}
-
-                            {useCase.investmentLevel && (
-                                <div className="panel-section">
-                                    <div className="panel-section-title">Investment Level</div>
-                                    <p className="panel-description">{useCase.investmentLevel}</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </>
-            );
-        };
-
-        // Compare View
-        const CompareView = ({ useCases, selected, onToggleSelect, weights }) => {
-            const comparisonAttributes = [
-                { key: 'roi', label: 'ROI Score' },
-                { key: 'maturity', label: 'Maturity' },
-                { key: 'adoption', label: 'Adoption' },
-                { key: 'readiness', label: 'Readiness' },
-                { key: 'category', label: 'Category' },
-                { key: 'investmentLevel', label: 'Investment Level' }
-            ];
-
-            return (
-                <div className="view compare-container">
-                    <div className="compare-selector">
-                        <h3 className="compare-title">Select Use Cases to Compare (2-4)</h3>
-                        <div className="compare-items">
-                            {useCases.map(uc => (
-                                <div
-                                    key={uc.id}
-                                    className={`compare-item ${selected.find(s => s.id === uc.id) ? 'selected' : ''}`}
-                                >
-                                    <div style={{ marginBottom: '0.75rem' }}>{uc.name}</div>
-                                    {selected.find(s => s.id === uc.id) && (
-                                        <button
-                                            className="compare-remove"
-                                            onClick={() => onToggleSelect(uc)}
-                                        >
-                                            Remove
-                                        </button>
-                                    )}
-                                    {!selected.find(s => s.id === uc.id) && selected.length < 4 && (
-                                        <button
-                                            className="compare-remove"
-                                            style={{
-                                                background: 'rgba(59, 130, 246, 0.2)',
-                                                color: 'var(--color-accent-blue)',
-                                                borderColor: 'rgba(59, 130, 246, 0.3)'
-                                            }}
-                                            onClick={() => onToggleSelect(uc)}
-                                        >
-                                            Add
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {selected.length >= 2 && (
-                        <div className="compare-results">
-                            <h3 className="compare-title">Comparison</h3>
-                            <table className="comparison-table">
-                                <thead>
-                                    <tr>
-                                        <th>Attribute</th>
-                                        {selected.map(uc => (
-                                            <th key={uc.id}>{uc.name}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Composite Score</strong></td>
-                                        {selected.map(uc => (
-                                            <td key={uc.id}>
-                                                <strong>{calculateCompositeScore(uc, weights).toFixed(1)}</strong>
-                                            </td>
-                                        ))}
-                                    </tr>
-                                    {comparisonAttributes.map(attr => (
-                                        <tr key={attr.key}>
-                                            <td>{attr.label}</td>
-                                            {selected.map(uc => (
-                                                <td key={uc.id}>
-                                                    {attr.key === 'category' ? uc.category : uc[attr.key] || uc.scores?.[attr.key] || '-'}
-                                                </td>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-
-                    {selected.length === 0 && (
-                        <div className="empty-state">
-                            <div className="empty-state-title">No use cases selected</div>
-                            <p>Select 2-4 use cases to compare them side by side</p>
-                        </div>
-                    )}
+              <div className="weight-control">
+                <div className="weight-label">
+                  <span className="weight-name">Risk (inverted)</span>
+                  <span className="weight-value">{Math.round(weights.risk * 100)}%</span>
                 </div>
-            );
-        };
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={weights.risk * 100}
+                  onChange={(e) => handleWeightChange('risk', e.target.value)}
+                  className="slider"
+                />
+              </div>
 
-        // Weights Calculator View
-        const WeightsCalculatorView = ({ weights, onWeightsChange, onReset }) => {
-            const dimensions = [
-                { key: 'roi', label: 'ROI Potential', description: 'Return on investment potential' },
-                { key: 'complexity', label: 'Complexity', description: 'Implementation complexity (inverted: lower is better)' },
-                { key: 'maturity', label: 'Market Maturity', description: 'Technology maturity level' },
-                { key: 'risk', label: 'Risk', description: 'Implementation risk (inverted: lower is better)' },
-                { key: 'adoption', label: 'Adoption Rate', description: 'Market adoption potential' },
-                { key: 'readiness', label: 'Organizational Readiness', description: 'Enterprise readiness' }
-            ];
-
-            const handleWeightChange = (key, value) => {
-                const newWeights = { ...weights, [key]: parseFloat(value) / 100 };
-                onWeightsChange(newWeights);
-            };
-
-            const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
-
-            return (
-                <div className="view">
-                    <div className="weights-calculator">
-                        <div className="methodology">
-                            <div className="methodology-title">Scoring Methodology</div>
-                            <div className="methodology-text">
-                                Adjust the weights below to customize how use cases are ranked. Each dimension is weighted as a percentage
-                                of the final composite score. Note: Complexity and Risk are inverted so that lower scores are better.
-                            </div>
-                        </div>
-
-                        {dimensions.map(dim => (
-                            <div key={dim.key} className="weight-slider-group">
-                                <div className="weight-label">
-                                    <div>
-                                        <div className="weight-name">{dim.label}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
-                                            {dim.description}
-                                        </div>
-                                    </div>
-                                    <div className="weight-value">{(weights[dim.key] * 100).toFixed(0)}%</div>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="100"
-                                    value={weights[dim.key] * 100}
-                                    onChange={(e) => handleWeightChange(dim.key, e.target.value)}
-                                    className="weight-slider"
-                                />
-                            </div>
-                        ))}
-
-                        <div className="weight-total">
-                            <div className="weight-total-label">Total Weight</div>
-                            <div className="weight-total-value">{(totalWeight * 100).toFixed(0)}%</div>
-                        </div>
-
-                        <button className="reset-weights-btn" onClick={onReset}>
-                            Reset to Defaults
-                        </button>
-                    </div>
+              <div className="weight-control">
+                <div className="weight-label">
+                  <span className="weight-name">Adoption</span>
+                  <span className="weight-value">{Math.round(weights.adoption * 100)}%</span>
                 </div>
-            );
-        };
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={weights.adoption * 100}
+                  onChange={(e) => handleWeightChange('adoption', e.target.value)}
+                  className="slider"
+                />
+              </div>
 
-        // Insights View
-        const InsightsView = ({ useCases, categoryStats, weights }) => {
-            const avgScores = {
-                all: useCases.reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / useCases.length,
-                horizontal: useCases
-                    .filter(uc => uc.category.toLowerCase() === 'horizontal')
-                    .reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / categoryStats.horizontal || 0,
-                vertical: useCases
-                    .filter(uc => uc.category.toLowerCase() === 'vertical')
-                    .reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / categoryStats.vertical || 0,
-                technology: useCases
-                    .filter(uc => uc.category.toLowerCase() === 'technology')
-                    .reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / categoryStats.technology || 0
-            };
-
-            return (
-                <div className="view">
-                    <div className="insights-container">
-                        <div className="stat-card">
-                            <div className="stat-value">{useCases.length}</div>
-                            <div className="stat-label">Total Use Cases</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-value">{avgScores.all.toFixed(1)}</div>
-                            <div className="stat-label">Average Score</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-value">{categoryStats.horizontal}</div>
-                            <div className="stat-label">Horizontal Use Cases</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-value">{categoryStats.vertical}</div>
-                            <div className="stat-label">Vertical Use Cases</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-value">{categoryStats.technology}</div>
-                            <div className="stat-label">Technology Use Cases</div>
-                        </div>
-                    </div>
-
-                    <div className="distribution-chart">
-                        <h3 className="chart-title">Average Scores by Category</h3>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                            gap: '2rem'
-                        }}>
-                            {[
-                                { label: 'Horizontal', value: avgScores.horizontal, count: categoryStats.horizontal },
-                                { label: 'Vertical', value: avgScores.vertical, count: categoryStats.vertical },
-                                { label: 'Technology', value: avgScores.technology, count: categoryStats.technology }
-                            ].map(cat => (
-                                <div key={cat.label}>
-                                    <div style={{ marginBottom: '1rem' }}>
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
-                                            {cat.label} ({cat.count})
-                                        </div>
-                                        <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-accent-blue)' }}>
-                                            {cat.value.toFixed(1)}
-                                        </div>
-                                    </div>
-                                    <div style={{
-                                        width: '100%',
-                                        height: '8px',
-                                        background: 'var(--color-bg-hover)',
-                                        borderRadius: '4px',
-                                        overflow: 'hidden'
-                                    }}>
-                                        <div style={{
-                                            width: `${(cat.value / 100) * 100}%`,
-                                            height: '100%',
-                                            background: 'var(--color-accent-blue)',
-                                            borderRadius: '4px',
-                                            transition: 'width 0.3s ease'
-                                        }}></div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+              <div className="weight-control">
+                <div className="weight-label">
+                  <span className="weight-name">Readiness</span>
+                  <span className="weight-value">{Math.round(weights.readiness * 100)}%</span>
                 </div>
-            );
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={weights.readiness * 100}
+                  onChange={(e) => handleWeightChange('readiness', e.target.value)}
+                  className="slider"
+                />
+              </div>
+
+              <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(15, 23, 42, 0.5)', borderRadius: '4px' }}>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                  TOTAL WEIGHT
+                </div>
+                <div style={{ fontSize: '1.3rem', color: totalWeight === 1 ? '#14b8a6' : '#f87171', fontWeight: 700 }}>
+                  {Math.round(totalWeight * 100)}%
+                </div>
+              </div>
+
+              <div className="weights-actions">
+                <button className="btn-primary" onClick={handleReset}>
+                  Reset Defaults
+                </button>
+              </div>
+            </div>
+
+            <div className="top-10-list">
+              <div className="top-10-title">Top 10 by Current Weights</div>
+              {top10.map((item, idx) => (
+                <div key={item.id} className="rank-item">
+                  <div className="rank-number">{idx + 1}</div>
+                  <div className="rank-info">
+                    <div className="rank-info-name">{item.name}</div>
+                    <div className="rank-info-score">{item.subcategory}</div>
+                  </div>
+                  <div className="rank-score">{item.score}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // INSIGHTS VIEW
+    function InsightsView({ data, weights }) {
+      const avgScore =
+        data.length > 0
+          ? Math.round(
+            data.reduce((sum, item) => sum + calculateCompositeScore(item.scores, weights), 0) /
+            data.length
+          )
+          : 0;
+
+      const categories = {};
+      data.forEach((item) => {
+        if (!categories[item.category]) {
+          categories[item.category] = 0;
+        }
+        categories[item.category]++;
+      });
+
+      const topCategory = Object.entries(categories).sort((a, b) => b[1] - a[1])[0];
+
+      return (
+        <div className="insights-view">
+          <div className="insights-header">
+            <h1 className="insights-title">Market Insights</h1>
+          </div>
+
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-value">{data.length}</div>
+              <div className="stat-label">Total Use Cases</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-value">{avgScore}</div>
+              <div className="stat-label">Average Score</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-value">{topCategory ? topCategory[1] : 0}</div>
+              <div className="stat-label">
+                Top Category: {topCategory ? topCategory[0] : '-'}
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-value">
+                {data.filter((item) => calculateCompositeScore(item.scores, weights) >= 75).length}
+              </div>
+              <div className="stat-label">High-Value Use Cases</div>
+            </div>
+          </div>
+
+          <div className="chart-section">
+            <h2 className="section-title">Category Distribution</h2>
+            <div className="bar-chart">
+              <CategoryChart data={Object.entries(categories)} />
+            </div>
+          </div>
+
+          <div className="chart-section">
+            <h2 className="section-title">Score Distribution</h2>
+            <div className="bar-chart">
+              <ScoreDistributionChart data={data} weights={weights} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function CategoryChart({ data }) {
+      const svgRef = useRef();
+
+      useEffect(() => {
+        if (!svgRef.current) return;
+
+        const width = 600;
+        const height = 300;
+        const margin = { top: 20, right: 20, bottom: 30, left: 100 };
+
+        const svg = d3.select(svgRef.current);
+        svg.selectAll('*').remove();
+
+        const colors = { Horizontal: '#3b82f6', Vertical: '#8b5cf6', Technology: '#14b8a6' };
+        const chartData = data.map(([name, count]) => ({ name, count }));
+
+        const yScale = d3
+          .scaleBand()
+          .domain(chartData.map((d) => d.name))
+          .range([0, height - margin.top - margin.bottom])
+          .padding(0.3);
+
+        const xScale = d3
+          .scaleLinear()
+          .domain([0, Math.max(...chartData.map((d) => d.count))])
+          .range([0, width - margin.left - margin.right]);
+
+        const g = svg
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        g.selectAll('rect')
+          .data(chartData)
+          .enter()
+          .append('rect')
+          .attr('y', (d) => yScale(d.name))
+          .attr('height', yScale.bandwidth())
+          .attr('width', (d) => xScale(d.count))
+          .attr('fill', (d) => colors[d.name] || '#3b82f6');
+
+        g.append('g')
+          .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
+          .call(d3.axisBottom(xScale));
+
+        g.append('g').call(
+          d3.axisLeft(yScale).tickFormat((d) => d)
+        );
+      }, [data]);
+
+      return <svg ref={svgRef}></svg>;
+    }
+
+    function ScoreDistributionChart({ data, weights }) {
+      const svgRef = useRef();
+
+      useEffect(() => {
+        if (!svgRef.current) return;
+
+        const width = 600;
+        const height = 300;
+        const margin = { top: 20, right: 20, bottom: 30, left: 60 };
+
+        const svg = d3.select(svgRef.current);
+        svg.selectAll('*').remove();
+
+        const scores = data.map((item) => calculateCompositeScore(item.scores, weights));
+        const binData = d3
+          .bin()
+          .domain([0, 100])
+          .thresholds(10)(scores);
+
+        const xScale = d3
+          .scaleLinear()
+          .domain([0, 100])
+          .range([0, width - margin.left - margin.right]);
+
+        const yScale = d3
+          .scaleLinear()
+          .domain([0, Math.max(...binData.map((d) => d.length))])
+          .range([height - margin.top - margin.bottom, 0]);
+
+        const g = svg
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        g.selectAll('rect')
+          .data(binData)
+          .enter()
+          .append('rect')
+          .attr('x', (d) => xScale(d.x0))
+          .attr('width', (d) => Math.max(0, xScale(d.x1) - xScale(d.x0) - 1))
+          .attr('y', (d) => yScale(d.length))
+          .attr('height', (d) => height - margin.top - margin.bottom - yScale(d.length))
+          .attr('fill', '#3b82f6');
+
+        g.append('g')
+          .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
+          .call(d3.axisBottom(xScale));
+
+        g.append('g').call(d3.axisLeft(yScale));
+      }, [data, weights]);
+
+      return <svg ref={svgRef}></svg>;
+    }
+
+    // DETAIL PANEL
+    function DetailPanel({ useCase, onClose, weights }) {
+      useEffect(() => {
+        const handleEscape = (e) => {
+          if (e.key === 'Escape') onClose();
         };
 
-        // D3 Visualizations
-        const drawBarChart = (element, useCases, weights, onSelectUseCase) => {
-            if (!element || useCases.length === 0) return;
+        if (useCase) {
+          document.addEventListener('keydown', handleEscape);
+          return () => document.removeEventListener('keydown', handleEscape);
+        }
+      }, [useCase, onClose]);
 
-            const data = useCases.slice(0, 20).map(uc => ({
-                name: uc.name,
-                score: calculateCompositeScore(uc, weights),
-                id: uc.id,
-                fullData: uc
-            })).sort((a, b) => b.score - a.score);
+      if (!useCase) {
+        return (
+          <div
+            className="detail-panel-overlay"
+            onClick={onClose}
+          ></div>
+        );
+      }
 
-            const margin = { top: 20, right: 30, bottom: 100, left: 40 };
-            const width = element.clientWidth - margin.left - margin.right;
-            const height = element.clientHeight - margin.top - margin.bottom;
+      const score = calculateCompositeScore(useCase.scores, weights);
 
-            d3.select(element).selectAll("*").remove();
+      return (
+        <>
+          <div className="detail-panel-overlay open" onClick={onClose}></div>
 
-            const svg = d3.select(element)
-                .attr('width', element.clientWidth)
-                .attr('height', element.clientHeight);
+          <div className="detail-panel open">
+            <div className="detail-header">
+              <button className="detail-close" onClick={onClose}>
+                ×
+              </button>
 
-            const g = svg.append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
+              <div className="detail-name">{useCase.name}</div>
 
-            const x = d3.scaleBand()
-                .range([0, width])
-                .padding(0.2)
-                .domain(data.map(d => d.name));
+              <div className="detail-badges">
+                <span
+                  className="badge category"
+                  style={{
+                    background: getCategoryColor(useCase.category) + '26',
+                    color: getCategoryColor(useCase.category),
+                  }}
+                >
+                  {useCase.category}
+                </span>
+                <span
+                  className="badge category"
+                  style={{
+                    background: 'rgba(71, 85, 105, 0.2)',
+                    color: '#cbd5e1',
+                  }}
+                >
+                  {useCase.subcategory}
+                </span>
+              </div>
+            </div>
 
-            const y = d3.scaleLinear()
-                .range([height, 0])
-                .domain([0, 100]);
+            <div className="detail-body">
+              <div className="detail-section">
+                <h3 className="detail-section-title">Composite Score</h3>
+                <div style={{ fontSize: '2rem', fontWeight: 700, color: '#3b82f6', marginBottom: '1rem' }}>
+                  {score}
+                </div>
+              </div>
 
-            // Grid lines
-            g.append('g')
-                .attr('class', 'grid-lines')
-                .call(d3.axisLeft(y)
-                    .tickSize(-width)
-                    .tickFormat('')
-                )
-                .selectAll('.tick')
-                .selectAll('line')
-                .attr('class', 'grid-line');
+              <div className="detail-section">
+                <h3 className="detail-section-title">Score Breakdown</h3>
+                <div className="score-bar">
+                  <div className="score-bar-label">ROI</div>
+                  <div className="score-bar-value">
+                    <div
+                      className="score-bar-fill"
+                      style={{ width: `${useCase.scores.roi}%` }}
+                    ></div>
+                  </div>
+                  <div className="score-bar-number">{useCase.scores.roi}</div>
+                </div>
 
-            // Define gradient
-            svg.append('defs').append('linearGradient')
-                .attr('id', 'barGradient')
-                .attr('x1', '0%')
-                .attr('x2', '0%')
-                .attr('y1', '0%')
-                .attr('y2', '100%')
-                .selectAll('stop')
-                .data([
-                    { offset: '0%', color: '#3b82f6' },
-                    { offset: '100%', color: '#8b5cf6' }
-                ])
-                .enter()
-                .append('stop')
-                .attr('offset', d => d.offset)
-                .attr('stop-color', d => d.color);
+                <div className="score-bar">
+                  <div className="score-bar-label">Complexity</div>
+                  <div className="score-bar-value">
+                    <div
+                      className="score-bar-fill"
+                      style={{ width: `${100 - useCase.scores.complexity}%` }}
+                    ></div>
+                  </div>
+                  <div className="score-bar-number">{useCase.scores.complexity}</div>
+                </div>
 
-            // Bars
-            g.selectAll('.bar')
-                .data(data)
-                .enter()
-                .append('rect')
-                .attr('class', 'bar-chart-bar')
-                .attr('x', d => x(d.name))
-                .attr('y', height)
-                .attr('width', x.bandwidth())
-                .attr('height', 0)
-                .on('click', (event, d) => onSelectUseCase(d.fullData))
-                .transition()
-                .duration(800)
-                .attr('y', d => y(d.score))
-                .attr('height', d => height - y(d.score));
+                <div className="score-bar">
+                  <div className="score-bar-label">Maturity</div>
+                  <div className="score-bar-value">
+                    <div
+                      className="score-bar-fill"
+                      style={{ width: `${useCase.scores.maturity}%` }}
+                    ></div>
+                  </div>
+                  <div className="score-bar-number">{useCase.scores.maturity}</div>
+                </div>
 
-            // X axis
-            g.append('g')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll('text')
-                .attr('transform', 'rotate(-45)')
-                .style('text-anchor', 'end')
-                .style('font-size', '12px')
-                .attr('class', 'axis-text');
+                <div className="score-bar">
+                  <div className="score-bar-label">Risk</div>
+                  <div className="score-bar-value">
+                    <div
+                      className="score-bar-fill"
+                      style={{ width: `${100 - useCase.scores.risk}%` }}
+                    ></div>
+                  </div>
+                  <div className="score-bar-number">{useCase.scores.risk}</div>
+                </div>
 
-            // Y axis
-            g.append('g')
-                .call(d3.axisLeft(y))
-                .selectAll('text')
-                .attr('class', 'axis-text');
-        };
+                <div className="score-bar">
+                  <div className="score-bar-label">Adoption</div>
+                  <div className="score-bar-value">
+                    <div
+                      className="score-bar-fill"
+                      style={{ width: `${useCase.scores.adoption}%` }}
+                    ></div>
+                  </div>
+                  <div className="score-bar-number">{useCase.scores.adoption}</div>
+                </div>
 
-        const drawRadarChart = (element, useCase) => {
-            if (!element) return;
+                <div className="score-bar">
+                  <div className="score-bar-label">Readiness</div>
+                  <div className="score-bar-value">
+                    <div
+                      className="score-bar-fill"
+                      style={{ width: `${useCase.scores.readiness}%` }}
+                    ></div>
+                  </div>
+                  <div className="score-bar-number">{useCase.scores.readiness}</div>
+                </div>
+              </div>
 
-            const data = [
-                { axis: 'ROI', value: useCase.scores.roi },
-                { axis: 'Maturity', value: useCase.scores.maturity },
-                { axis: 'Adoption', value: useCase.scores.adoption },
-                { axis: 'Readiness', value: useCase.scores.readiness },
-                { axis: 'Complexity', value: 100 - useCase.scores.complexity },
-                { axis: 'Risk', value: 100 - useCase.scores.risk }
-            ];
+              <div className="detail-section">
+                <h3 className="detail-section-title">How It Works</h3>
+                <div className="detail-text">{useCase.howItWorks}</div>
+              </div>
 
-            const margin = 30;
-            const width = element.clientWidth;
-            const height = element.clientHeight;
-            const radius = Math.min(width, height) / 2 - margin;
+              <div className="detail-section">
+                <h3 className="detail-section-title">Business Requirements</h3>
+                <ul className="detail-list">
+                  {useCase.businessRequirements.map((req, idx) => (
+                    <li key={idx}>{req}</li>
+                  ))}
+                </ul>
+              </div>
 
-            d3.select(element).selectAll("*").remove();
+              <div className="detail-section">
+                <h3 className="detail-section-title">Technical Requirements</h3>
+                <ul className="detail-list">
+                  {useCase.technicalRequirements.map((req, idx) => (
+                    <li key={idx}>{req}</li>
+                  ))}
+                </ul>
+              </div>
 
-            const svg = d3.select(element)
-                .attr('width', width)
-                .attr('height', height);
+              <div className="detail-section">
+                <h3 className="detail-section-title">Key Benefits</h3>
+                <ul className="detail-list">
+                  {useCase.keyBenefits.map((benefit, idx) => (
+                    <li key={idx}>{benefit}</li>
+                  ))}
+                </ul>
+              </div>
 
-            const g = svg.append('g')
-                .attr('transform', `translate(${width / 2},${height / 2})`);
+              <div className="detail-section">
+                <h3 className="detail-section-title">Real-World Examples</h3>
+                <ul className="detail-list">
+                  {useCase.examples.map((example, idx) => (
+                    <li key={idx}>{example}</li>
+                  ))}
+                </ul>
+              </div>
 
-            const angleSlice = (Math.PI * 2) / data.length;
+              <div className="detail-section">
+                <h3 className="detail-section-title">Timeline</h3>
+                <div className="detail-text">{useCase.timeline}</div>
+              </div>
 
-            // Circle backgrounds
-            for (let i = 1; i <= 5; i++) {
-                g.append('circle')
-                    .attr('r', (radius / 5) * i)
-                    .attr('class', 'grid-line')
-                    .attr('fill', 'none');
-            }
+              <div className="detail-section">
+                <h3 className="detail-section-title">Investment Level</h3>
+                <div className="detail-text">{useCase.investmentLevel}</div>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
 
-            // Axes
-            g.selectAll('.axis')
-                .data(data)
-                .enter()
-                .append('line')
-                .attr('class', 'axis-line')
-                .attr('x1', 0)
-                .attr('y1', 0)
-                .attr('x2', (d, i) => radius * Math.cos(angleSlice * i - Math.PI / 2))
-                .attr('y2', (d, i) => radius * Math.sin(angleSlice * i - Math.PI / 2));
-
-            // Axis labels
-            g.selectAll('.axis-label')
-                .data(data)
-                .enter()
-                .append('text')
-                .attr('class', 'axis-text')
-                .attr('x', (d, i) => (radius + 30) * Math.cos(angleSlice * i - Math.PI / 2))
-                .attr('y', (d, i) => (radius + 30) * Math.sin(angleSlice * i - Math.PI / 2))
-                .attr('text-anchor', 'middle')
-                .attr('dy', '0.35em')
-                .text(d => d.axis);
-
-            // Data path
-            const pathPoints = data.map((d, i) => [
-                (d.value / 100) * radius * Math.cos(angleSlice * i - Math.PI / 2),
-                (d.value / 100) * radius * Math.sin(angleSlice * i - Math.PI / 2)
-            ]);
-
-            const pathString = 'M' + pathPoints.map(p => p.join(',')).join('L') + 'Z';
-
-            g.append('path')
-                .attr('d', pathString)
-                .attr('fill', 'url(#radarGradient)')
-                .attr('fill-opacity', 0.5)
-                .attr('stroke', '#3b82f6')
-                .attr('stroke-width', 2);
-
-            // Add gradient for radar
-            svg.append('defs').append('linearGradient')
-                .attr('id', 'radarGradient')
-                .attr('x1', '0%')
-                .attr('x2', '0%')
-                .attr('y1', '0%')
-                .attr('y2', '100%')
-                .selectAll('stop')
-                .data([
-                    { offset: '0%', color: '#3b82f6' },
-                    { offset: '100%', color: '#8b5cf6' }
-                ])
-                .enter()
-                .append('stop')
-                .attr('offset', d => d.offset)
-                .attr('stop-color', d => d.color);
-
-            // Data points
-            g.selectAll('.data-point')
-                .data(pathPoints)
-                .enter()
-                .append('circle')
-                .attr('cx', d => d[0])
-                .attr('cy', d => d[1])
-                .attr('r', 4)
-                .attr('fill', '#3b82f6');
-        };
-
-        // Render App
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-    </script>
+    // RENDER
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
