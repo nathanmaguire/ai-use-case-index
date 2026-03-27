@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Use Case Index</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- React + ReactDOM + Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg-dark: #0a0f1a;
+            --color-bg-card: #0f141f;
+            --color-bg-hover: #151b2a;
+            --color-text-primary: #e8eef7;
+            --color-text-secondary: #a8b2c1;
+            --color-accent-blue: #3b82f6;
+            --color-accent-purple: #8b5cf6;
+            --color-accent-teal: #14b8a6;
+            --color-accent-orange: #f97316;
+            --color-border: #1e2438;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-accent-blue);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-accent-purple);
+        }
+
+        /* Layout */
+        .app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 15, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        .nav-link:hover {
+            color: var(--color-accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--color-accent-blue);
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--color-accent-blue);
+            border-radius: 1px;
+            transition: var(--transition);
+        }
+
+        .main-content {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Views */
+        .view {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Rankings View */
+        .rankings-view {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .controls-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.75rem 1rem;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text-primary);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--color-accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .chip:hover {
+            border-color: var(--color-accent-blue);
+            color: var(--color-accent-blue);
+        }
+
+        .chip.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--color-accent-blue);
+            color: var(--color-accent-blue);
+        }
+
+        .sort-select {
+            padding: 0.75rem 1rem;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text-primary);
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .sort-select:hover {
+            border-color: var(--color-accent-blue);
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--color-accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .rankings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .ranking-item {
+            padding: 1.5rem;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .ranking-item:hover {
+            border-color: var(--color-accent-blue);
+            background: var(--color-bg-hover);
+            transform: translateX(4px);
+        }
+
+        .ranking-index {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent-blue);
+            min-width: 60px;
+        }
+
+        .ranking-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ranking-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .ranking-category {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--color-accent-blue);
+            font-weight: 500;
+        }
+
+        .category-badge.vertical {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--color-accent-purple);
+        }
+
+        .category-badge.technology {
+            background: rgba(20, 184, 166, 0.1);
+            border-color: rgba(20, 184, 166, 0.3);
+            color: var(--color-accent-teal);
+        }
+
+        .ranking-description {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .ranking-score {
+            text-align: right;
+            min-width: 120px;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Bar Chart */
+        .chart-container {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--color-text-primary);
+        }
+
+        svg {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .bar-chart-bar {
+            fill: url(#barGradient);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .bar-chart-bar:hover {
+            opacity: 0.8;
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+        }
+
+        .bar-chart-label {
+            font-size: 0.85rem;
+            fill: var(--color-text-secondary);
+        }
+
+        .bar-chart-value {
+            font-size: 0.75rem;
+            fill: var(--color-text-primary);
+            font-weight: 600;
+        }
+
+        .axis-line {
+            stroke: var(--color-border);
+            stroke-width: 1;
+        }
+
+        .axis-text {
+            font-size: 0.8rem;
+            fill: var(--color-text-secondary);
+        }
+
+        .grid-line {
+            stroke: var(--color-border);
+            stroke-dasharray: 2,2;
+            opacity: 0.5;
+        }
+
+        /* Category View */
+        .categories-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-column {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--color-text-primary);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .category-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-accent-blue);
+        }
+
+        .subcategories {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .subcategory-item {
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subcategory-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--color-accent-blue);
+            transform: translateX(4px);
+        }
+
+        .subcategory-name {
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .subcategory-count {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+        }
+
+        /* Detail Panel */
+        .detail-panel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .detail-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            background: var(--color-bg-dark);
+            border-left: 1px solid var(--color-border);
+            z-index: 2000;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .panel-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: var(--transition);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: var(--color-accent-blue);
+        }
+
+        .panel-content {
+            padding: 2rem;
+        }
+
+        .panel-section {
+            margin-bottom: 2rem;
+        }
+
+        .panel-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.9rem;
+            color: var(--color-accent-blue);
+        }
+
+        .panel-description {
+            font-size: 0.95rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        .panel-list {
+            list-style: none;
+        }
+
+        .panel-list-item {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .panel-list-item::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--color-accent-blue);
+            font-weight: 700;
+        }
+
+        .radar-chart-container {
+            margin: 1rem 0;
+        }
+
+        /* Compare View */
+        .compare-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .compare-selector {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .compare-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--color-text-primary);
+        }
+
+        .compare-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .compare-item {
+            padding: 1rem;
+            background: var(--color-bg-hover);
+            border: 2px solid var(--color-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .compare-item:hover {
+            border-color: var(--color-accent-blue);
+        }
+
+        .compare-item.selected {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--color-accent-blue);
+        }
+
+        .compare-remove {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        .compare-remove:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .compare-results {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .compare-card {
+            background: var(--color-bg-hover);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 1.5rem;
+        }
+
+        .compare-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .comparison-table th {
+            text-align: left;
+            padding: 1rem;
+            background: var(--color-bg-hover);
+            border-bottom: 2px solid var(--color-border);
+            color: var(--color-text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        /* Weights Calculator View */
+        .weights-calculator {
+            max-width: 800px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        .methodology {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .methodology-title {
+            font-weight: 600;
+            color: var(--color-accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .methodology-text {
+            font-size: 0.95rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        .weight-slider-group {
+            margin-bottom: 2rem;
+        }
+
+        .weight-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .weight-name {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .weight-value {
+            display: inline-block;
+            min-width: 60px;
+            text-align: right;
+            font-weight: 700;
+            color: var(--color-accent-blue);
+        }
+
+        .weight-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-bg-hover);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .weight-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-accent-blue);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .weight-slider::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3);
+        }
+
+        .weight-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-accent-blue);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .weight-slider::-moz-range-thumb:hover {
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.3);
+        }
+
+        .weight-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--color-bg-hover);
+            border-radius: 6px;
+            margin: 1.5rem 0;
+        }
+
+        .weight-total-label {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .weight-total-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--color-accent-blue);
+        }
+
+        .reset-weights-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-accent-purple);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .reset-weights-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Trends/Insights View */
+        .insights-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .distribution-chart {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 2rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--color-text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .categories-container {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-panel {
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .ranking-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .ranking-score {
+                text-align: left;
+                width: 100%;
+            }
+
+            .detail-panel {
+                max-width: 100%;
+            }
+
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box,
+            .sort-select {
+                width: 100%;
+            }
+
+            .filter-chips {
+                justify-content: flex-start;
+            }
+
+            .compare-items {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            color: var(--color-text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--color-border);
+            border-top-color: var(--color-accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            background-color: var(--color-bg-hover);
+            color: var(--color-text-primary);
+            text-align: center;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            border: 1px solid var(--color-border);
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Configuration
+        const CONFIG = {
+            dataPath: 'data/use-cases.json',
+            defaultWeights: {
+                roi: 0.25,
+                complexity: 0.15,
+                maturity: 0.20,
+                risk: 0.10,
+                adoption: 0.15,
+                readiness: 0.15
+            }
+        };
+
+        // Utility Functions
+        const calculateCompositeScore = (useCase, weights) => {
+            const complexity = 100 - useCase.scores.complexity;
+            const risk = 100 - useCase.scores.risk;
+
+            return (
+                useCase.scores.roi * weights.roi +
+                complexity * weights.complexity +
+                useCase.scores.maturity * weights.maturity +
+                risk * weights.risk +
+                useCase.scores.adoption * weights.adoption +
+                useCase.scores.readiness * weights.readiness
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const [currentView, setCurrentView] = useState('rankings');
+            const [useCases, setUseCases] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [filterCategory, setFilterCategory] = useState('all');
+            const [sortBy, setSortBy] = useState('composite');
+            const [selectedUseCase, setSelectedUseCase] = useState(null);
+            const [weights, setWeights] = useState(CONFIG.defaultWeights);
+            const [compareSelected, setCompareSelected] = useState([]);
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+            // Load data
+            useEffect(() => {
+                const loadData = async () => {
+                    try {
+                        const response = await fetch(CONFIG.dataPath);
+                        if (!response.ok) throw new Error('Failed to load data');
+                        const data = await response.json();
+                        setUseCases(data);
+                    } catch (err) {
+                        setError(err.message);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                loadData();
+            }, []);
+
+            // Filter and sort use cases
+            const filteredUseCases = useCases.filter(uc => {
+                const matchesSearch = !searchQuery ||
+                    uc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    uc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    uc.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    uc.subcategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (uc.industry && uc.industry.some(ind => ind.toLowerCase().includes(searchQuery.toLowerCase())));
+
+                const matchesFilter = filterCategory === 'all' || uc.category.toLowerCase() === filterCategory.toLowerCase();
+
+                return matchesSearch && matchesFilter;
+            });
+
+            const sortedUseCases = [...filteredUseCases].sort((a, b) => {
+                const getScoreValue = (uc, sortKey) => {
+                    if (sortKey === 'composite') return calculateCompositeScore(uc, weights);
+                    return uc.scores[sortKey] || 0;
+                };
+
+                return getScoreValue(b, sortBy) - getScoreValue(a, sortBy);
+            });
+
+            const categoryStats = {
+                horizontal: useCases.filter(uc => uc.category.toLowerCase() === 'horizontal').length,
+                vertical: useCases.filter(uc => uc.category.toLowerCase() === 'vertical').length,
+                technology: useCases.filter(uc => uc.category.toLowerCase() === 'technology').length
+            };
+
+            return (
+                <div className="app">
+                    <Header
+                        currentView={currentView}
+                        onNavigate={(view) => {
+                            setCurrentView(view);
+                            setMobileMenuOpen(false);
+                            setSelectedUseCase(null);
+                        }}
+                        mobileMenuOpen={mobileMenuOpen}
+                        onToggleMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    />
+
+                    <main className="main-content">
+                        {loading ? (
+                            <div className="loading">
+                                <div className="spinner"></div>
+                                <span>Loading use cases...</span>
+                            </div>
+                        ) : error ? (
+                            <div className="empty-state">
+                                <div className="empty-state-title">Error Loading Data</div>
+                                <p>{error}</p>
+                            </div>
+                        ) : (
+                            <>
+                                {currentView === 'rankings' && (
+                                    <RankingsView
+                                        useCases={sortedUseCases}
+                                        searchQuery={searchQuery}
+                                        onSearchChange={setSearchQuery}
+                                        filterCategory={filterCategory}
+                                        onFilterChange={setFilterCategory}
+                                        sortBy={sortBy}
+                                        onSortChange={setSortBy}
+                                        onSelectUseCase={setSelectedUseCase}
+                                        weights={weights}
+                                    />
+                                )}
+                                {currentView === 'categories' && (
+                                    <CategoriesView
+                                        useCases={useCases}
+                                        categoryStats={categoryStats}
+                                        onSelectCategory={(cat) => {
+                                            setFilterCategory(cat);
+                                            setCurrentView('rankings');
+                                        }}
+                                    />
+                                )}
+                                {currentView === 'compare' && (
+                                    <CompareView
+                                        useCases={useCases}
+                                        selected={compareSelected}
+                                        onToggleSelect={(uc) => {
+                                            if (compareSelected.find(s => s.id === uc.id)) {
+                                                setCompareSelected(compareSelected.filter(s => s.id !== uc.id));
+                                            } else if (compareSelected.length < 4) {
+                                                setCompareSelected([...compareSelected, uc]);
+                                            }
+                                        }}
+                                        weights={weights}
+                                    />
+                                )}
+                                {currentView === 'weights' && (
+                                    <WeightsCalculatorView
+                                        weights={weights}
+                                        onWeightsChange={setWeights}
+                                        onReset={() => setWeights(CONFIG.defaultWeights)}
+                                    />
+                                )}
+                                {currentView === 'insights' && (
+                                    <InsightsView
+                                        useCases={useCases}
+                                        categoryStats={categoryStats}
+                                        weights={weights}
+                                    />
+                                )}
+                            </>
+                        )}
+                    </main>
+
+                    {selectedUseCase && (
+                        <DetailPanel
+                            useCase={selectedUseCase}
+                            onClose={() => setSelectedUseCase(null)}
+                            weights={weights}
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        // Header Component
+        const Header = ({ currentView, onNavigate, mobileMenuOpen, onToggleMenu }) => {
+            return (
+                <header className="app-header">
+                    <div className="header-content">
+                        <div className="logo">
+                            AI Use Case Index
+                        </div>
+
+                        <nav className="nav-menu">
+                            <button
+                                className={`nav-link ${currentView === 'rankings' ? 'active' : ''}`}
+                                onClick={() => onNavigate('rankings')}
+                            >
+                                Rankings
+                            </button>
+                            <button
+                                className={`nav-link ${currentView === 'categories' ? 'active' : ''}`}
+                                onClick={() => onNavigate('categories')}
+                            >
+                                Categories
+                            </button>
+                            <button
+                                className={`nav-link ${currentView === 'compare' ? 'active' : ''}`}
+                                onClick={() => onNavigate('compare')}
+                            >
+                                Compare
+                            </button>
+                            <button
+                                className={`nav-link ${currentView === 'weights' ? 'active' : ''}`}
+                                onClick={() => onNavigate('weights')}
+                            >
+                                Weights
+                            </button>
+                            <button
+                                className={`nav-link ${currentView === 'insights' ? 'active' : ''}`}
+                                onClick={() => onNavigate('insights')}
+                            >
+                                Insights
+                            </button>
+                        </nav>
+
+                        <button className="hamburger" onClick={onToggleMenu}>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+
+                        {mobileMenuOpen && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                background: 'var(--color-bg-card)',
+                                borderBottom: '1px solid var(--color-border)',
+                                display: 'flex',
+                                flexDirection: 'column'
+                            }}>
+                                <button
+                                    className={`nav-link ${currentView === 'rankings' ? 'active' : ''}`}
+                                    onClick={() => onNavigate('rankings')}
+                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
+                                >
+                                    Rankings
+                                </button>
+                                <button
+                                    className={`nav-link ${currentView === 'categories' ? 'active' : ''}`}
+                                    onClick={() => onNavigate('categories')}
+                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
+                                >
+                                    Categories
+                                </button>
+                                <button
+                                    className={`nav-link ${currentView === 'compare' ? 'active' : ''}`}
+                                    onClick={() => onNavigate('compare')}
+                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
+                                >
+                                    Compare
+                                </button>
+                                <button
+                                    className={`nav-link ${currentView === 'weights' ? 'active' : ''}`}
+                                    onClick={() => onNavigate('weights')}
+                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
+                                >
+                                    Weights
+                                </button>
+                                <button
+                                    className={`nav-link ${currentView === 'insights' ? 'active' : ''}`}
+                                    onClick={() => onNavigate('insights')}
+                                    style={{ padding: '1rem 2rem', textAlign: 'left' }}
+                                >
+                                    Insights
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </header>
+            );
+        };
+
+        // Rankings View
+        const RankingsView = ({ useCases, searchQuery, onSearchChange, filterCategory, onFilterChange, sortBy, onSortChange, onSelectUseCase, weights }) => {
+            const chartRef = useRef(null);
+
+            useEffect(() => {
+                if (chartRef.current && useCases.length > 0) {
+                    drawBarChart(chartRef.current, useCases, weights, onSelectUseCase);
+                }
+            }, [useCases, weights, onSelectUseCase]);
+
+            return (
+                <div className="view rankings-view">
+                    <div className="controls-bar">
+                        <input
+                            type="text"
+                            className="search-box"
+                            placeholder="Search use cases..."
+                            value={searchQuery}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                        />
+                        <div className="filter-chips">
+                            {['All', 'Horizontal', 'Vertical', 'Technology'].map(cat => (
+                                <button
+                                    key={cat}
+                                    className={`chip ${filterCategory === (cat === 'All' ? 'all' : cat.toLowerCase()) ? 'active' : ''}`}
+                                    onClick={() => onFilterChange(cat === 'All' ? 'all' : cat.toLowerCase())}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+                        <select
+                            className="sort-select"
+                            value={sortBy}
+                            onChange={(e) => onSortChange(e.target.value)}
+                        >
+                            <option value="composite">Composite Score</option>
+                            <option value="roi">ROI</option>
+                            <option value="maturity">Maturity</option>
+                            <option value="adoption">Adoption</option>
+                            <option value="readiness">Readiness</option>
+                        </select>
+                    </div>
+
+                    {useCases.length === 0 ? (
+                        <div className="empty-state">
+                            <div className="empty-state-title">No use cases found</div>
+                            <p>Try adjusting your filters or search query</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="rankings-container">
+                                {useCases.map((uc, idx) => (
+                                    <RankingItem
+                                        key={uc.id}
+                                        index={idx + 1}
+                                        useCase={uc}
+                                        score={calculateCompositeScore(uc, weights)}
+                                        onClick={() => onSelectUseCase(uc)}
+                                    />
+                                ))}
+                            </div>
+
+                            <div className="chart-container">
+                                <h3 className="chart-title">Composite Score Distribution</h3>
+                                <svg ref={chartRef} style={{ width: '100%', height: '400px' }}></svg>
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+        };
+
+        // Ranking Item Component
+        const RankingItem = ({ index, useCase, score, onClick }) => {
+            return (
+                <div className="ranking-item" onClick={onClick}>
+                    <div className="ranking-index">{index}</div>
+                    <div className="ranking-info">
+                        <div className="ranking-name">{useCase.name}</div>
+                        <div className="ranking-category">
+                            <span className="category-badge">{useCase.category}</span>
+                            <span className="category-badge" style={{
+                                background: 'rgba(139, 92, 246, 0.1)',
+                                borderColor: 'rgba(139, 92, 246, 0.3)',
+                                color: 'var(--color-accent-purple)'
+                            }}>
+                                {useCase.subcategory}
+                            </span>
+                        </div>
+                        <div className="ranking-description">{useCase.description}</div>
+                    </div>
+                    <div className="ranking-score">
+                        <div className="score-value">{score.toFixed(1)}</div>
+                        <div className="score-label">Composite</div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Categories View
+        const CategoriesView = ({ useCases, categoryStats, onSelectCategory }) => {
+            const categories = [
+                { name: 'Horizontal', count: categoryStats.horizontal, type: 'horizontal' },
+                { name: 'Vertical', count: categoryStats.vertical, type: 'vertical' },
+                { name: 'Technology', count: categoryStats.technology, type: 'technology' }
+            ];
+
+            const getSubcategories = (category) => {
+                return [...new Set(useCases
+                    .filter(uc => uc.category.toLowerCase() === category.toLowerCase())
+                    .map(uc => uc.subcategory))]
+                    .sort();
+            };
+
+            return (
+                <div className="view">
+                    <div className="categories-container">
+                        {categories.map(cat => (
+                            <div key={cat.type} className="category-column">
+                                <h2 className="category-title">
+                                    {cat.name}
+                                    <span className="category-count">{cat.count}</span>
+                                </h2>
+                                <div className="subcategories">
+                                    {getSubcategories(cat.type).map(subcat => {
+                                        const count = useCases.filter(uc =>
+                                            uc.category.toLowerCase() === cat.type && uc.subcategory === subcat
+                                        ).length;
+                                        return (
+                                            <div
+                                                key={subcat}
+                                                className="subcategory-item"
+                                                onClick={() => onSelectCategory(cat.type)}
+                                            >
+                                                <span className="subcategory-name">{subcat}</span>
+                                                <span className="subcategory-count">{count}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Detail Panel Component
+        const DetailPanel = ({ useCase, onClose, weights }) => {
+            const radarRef = useRef(null);
+
+            useEffect(() => {
+                if (radarRef.current) {
+                    drawRadarChart(radarRef.current, useCase);
+                }
+            }, [useCase]);
+
+            return (
+                <>
+                    <div className="detail-panel-overlay" onClick={onClose}></div>
+                    <div className="detail-panel">
+                        <div className="panel-header">
+                            <div>
+                                <h2 className="panel-title">{useCase.name}</h2>
+                            </div>
+                            <button className="close-btn" onClick={onClose}>×</button>
+                        </div>
+
+                        <div className="panel-content">
+                            <div className="panel-section">
+                                <div className="panel-description">{useCase.description}</div>
+                            </div>
+
+                            <div className="panel-section">
+                                <div className="panel-section-title">Category</div>
+                                <div className="ranking-category">
+                                    <span className="category-badge">{useCase.category}</span>
+                                    <span className="category-badge" style={{
+                                        background: 'rgba(139, 92, 246, 0.1)',
+                                        borderColor: 'rgba(139, 92, 246, 0.3)',
+                                        color: 'var(--color-accent-purple)'
+                                    }}>
+                                        {useCase.subcategory}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {useCase.industry && useCase.industry.length > 0 && (
+                                <div className="panel-section">
+                                    <div className="panel-section-title">Industries</div>
+                                    <div className="ranking-category">
+                                        {useCase.industry.map(ind => (
+                                            <span key={ind} className="category-badge" style={{
+                                                background: 'rgba(20, 184, 166, 0.1)',
+                                                borderColor: 'rgba(20, 184, 166, 0.3)',
+                                                color: 'var(--color-accent-teal)'
+                                            }}>
+                                                {ind}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="panel-section">
+                                <div className="panel-section-title">Scores</div>
+                                <div className="radar-chart-container">
+                                    <svg ref={radarRef} style={{ width: '100%', height: '250px' }}></svg>
+                                </div>
+                            </div>
+
+                            <div className="panel-section">
+                                <div className="panel-section-title">How It Works</div>
+                                <p className="panel-description">{useCase.howItWorks}</p>
+                            </div>
+
+                            {useCase.businessRequirements && useCase.businessRequirements.length > 0 && (
+                                <div className="panel-section">
+                                    <div className="panel-section-title">Business Requirements</div>
+                                    <ul className="panel-list">
+                                        {useCase.businessRequirements.map((req, idx) => (
+                                            <li key={idx} className="panel-list-item">{req}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {useCase.technicalRequirements && useCase.technicalRequirements.length > 0 && (
+                                <div className="panel-section">
+                                    <div className="panel-section-title">Technical Requirements</div>
+                                    <ul className="panel-list">
+                                        {useCase.technicalRequirements.map((req, idx) => (
+                                            <li key={idx} className="panel-list-item">{req}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {useCase.keyBenefits && useCase.keyBenefits.length > 0 && (
+                                <div className="panel-section">
+                                    <div className="panel-section-title">Key Benefits</div>
+                                    <ul className="panel-list">
+                                        {useCase.keyBenefits.map((benefit, idx) => (
+                                            <li key={idx} className="panel-list-item">{benefit}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {useCase.examples && useCase.examples.length > 0 && (
+                                <div className="panel-section">
+                                    <div className="panel-section-title">Real-World Examples</div>
+                                    <ul className="panel-list">
+                                        {useCase.examples.map((example, idx) => (
+                                            <li key={idx} className="panel-list-item">{example}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {useCase.timeline && (
+                                <div className="panel-section">
+                                    <div className="panel-section-title">Timeline</div>
+                                    <p className="panel-description">{useCase.timeline}</p>
+                                </div>
+                            )}
+
+                            {useCase.investmentLevel && (
+                                <div className="panel-section">
+                                    <div className="panel-section-title">Investment Level</div>
+                                    <p className="panel-description">{useCase.investmentLevel}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </>
+            );
+        };
+
+        // Compare View
+        const CompareView = ({ useCases, selected, onToggleSelect, weights }) => {
+            const comparisonAttributes = [
+                { key: 'roi', label: 'ROI Score' },
+                { key: 'maturity', label: 'Maturity' },
+                { key: 'adoption', label: 'Adoption' },
+                { key: 'readiness', label: 'Readiness' },
+                { key: 'category', label: 'Category' },
+                { key: 'investmentLevel', label: 'Investment Level' }
+            ];
+
+            return (
+                <div className="view compare-container">
+                    <div className="compare-selector">
+                        <h3 className="compare-title">Select Use Cases to Compare (2-4)</h3>
+                        <div className="compare-items">
+                            {useCases.map(uc => (
+                                <div
+                                    key={uc.id}
+                                    className={`compare-item ${selected.find(s => s.id === uc.id) ? 'selected' : ''}`}
+                                >
+                                    <div style={{ marginBottom: '0.75rem' }}>{uc.name}</div>
+                                    {selected.find(s => s.id === uc.id) && (
+                                        <button
+                                            className="compare-remove"
+                                            onClick={() => onToggleSelect(uc)}
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
+                                    {!selected.find(s => s.id === uc.id) && selected.length < 4 && (
+                                        <button
+                                            className="compare-remove"
+                                            style={{
+                                                background: 'rgba(59, 130, 246, 0.2)',
+                                                color: 'var(--color-accent-blue)',
+                                                borderColor: 'rgba(59, 130, 246, 0.3)'
+                                            }}
+                                            onClick={() => onToggleSelect(uc)}
+                                        >
+                                            Add
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {selected.length >= 2 && (
+                        <div className="compare-results">
+                            <h3 className="compare-title">Comparison</h3>
+                            <table className="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Attribute</th>
+                                        {selected.map(uc => (
+                                            <th key={uc.id}>{uc.name}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Composite Score</strong></td>
+                                        {selected.map(uc => (
+                                            <td key={uc.id}>
+                                                <strong>{calculateCompositeScore(uc, weights).toFixed(1)}</strong>
+                                            </td>
+                                        ))}
+                                    </tr>
+                                    {comparisonAttributes.map(attr => (
+                                        <tr key={attr.key}>
+                                            <td>{attr.label}</td>
+                                            {selected.map(uc => (
+                                                <td key={uc.id}>
+                                                    {attr.key === 'category' ? uc.category : uc[attr.key] || uc.scores?.[attr.key] || '-'}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
+                    {selected.length === 0 && (
+                        <div className="empty-state">
+                            <div className="empty-state-title">No use cases selected</div>
+                            <p>Select 2-4 use cases to compare them side by side</p>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Weights Calculator View
+        const WeightsCalculatorView = ({ weights, onWeightsChange, onReset }) => {
+            const dimensions = [
+                { key: 'roi', label: 'ROI Potential', description: 'Return on investment potential' },
+                { key: 'complexity', label: 'Complexity', description: 'Implementation complexity (inverted: lower is better)' },
+                { key: 'maturity', label: 'Market Maturity', description: 'Technology maturity level' },
+                { key: 'risk', label: 'Risk', description: 'Implementation risk (inverted: lower is better)' },
+                { key: 'adoption', label: 'Adoption Rate', description: 'Market adoption potential' },
+                { key: 'readiness', label: 'Organizational Readiness', description: 'Enterprise readiness' }
+            ];
+
+            const handleWeightChange = (key, value) => {
+                const newWeights = { ...weights, [key]: parseFloat(value) / 100 };
+                onWeightsChange(newWeights);
+            };
+
+            const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+
+            return (
+                <div className="view">
+                    <div className="weights-calculator">
+                        <div className="methodology">
+                            <div className="methodology-title">Scoring Methodology</div>
+                            <div className="methodology-text">
+                                Adjust the weights below to customize how use cases are ranked. Each dimension is weighted as a percentage
+                                of the final composite score. Note: Complexity and Risk are inverted so that lower scores are better.
+                            </div>
+                        </div>
+
+                        {dimensions.map(dim => (
+                            <div key={dim.key} className="weight-slider-group">
+                                <div className="weight-label">
+                                    <div>
+                                        <div className="weight-name">{dim.label}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
+                                            {dim.description}
+                                        </div>
+                                    </div>
+                                    <div className="weight-value">{(weights[dim.key] * 100).toFixed(0)}%</div>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={weights[dim.key] * 100}
+                                    onChange={(e) => handleWeightChange(dim.key, e.target.value)}
+                                    className="weight-slider"
+                                />
+                            </div>
+                        ))}
+
+                        <div className="weight-total">
+                            <div className="weight-total-label">Total Weight</div>
+                            <div className="weight-total-value">{(totalWeight * 100).toFixed(0)}%</div>
+                        </div>
+
+                        <button className="reset-weights-btn" onClick={onReset}>
+                            Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // Insights View
+        const InsightsView = ({ useCases, categoryStats, weights }) => {
+            const avgScores = {
+                all: useCases.reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / useCases.length,
+                horizontal: useCases
+                    .filter(uc => uc.category.toLowerCase() === 'horizontal')
+                    .reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / categoryStats.horizontal || 0,
+                vertical: useCases
+                    .filter(uc => uc.category.toLowerCase() === 'vertical')
+                    .reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / categoryStats.vertical || 0,
+                technology: useCases
+                    .filter(uc => uc.category.toLowerCase() === 'technology')
+                    .reduce((sum, uc) => sum + calculateCompositeScore(uc, weights), 0) / categoryStats.technology || 0
+            };
+
+            return (
+                <div className="view">
+                    <div className="insights-container">
+                        <div className="stat-card">
+                            <div className="stat-value">{useCases.length}</div>
+                            <div className="stat-label">Total Use Cases</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{avgScores.all.toFixed(1)}</div>
+                            <div className="stat-label">Average Score</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{categoryStats.horizontal}</div>
+                            <div className="stat-label">Horizontal Use Cases</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{categoryStats.vertical}</div>
+                            <div className="stat-label">Vertical Use Cases</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{categoryStats.technology}</div>
+                            <div className="stat-label">Technology Use Cases</div>
+                        </div>
+                    </div>
+
+                    <div className="distribution-chart">
+                        <h3 className="chart-title">Average Scores by Category</h3>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                            gap: '2rem'
+                        }}>
+                            {[
+                                { label: 'Horizontal', value: avgScores.horizontal, count: categoryStats.horizontal },
+                                { label: 'Vertical', value: avgScores.vertical, count: categoryStats.vertical },
+                                { label: 'Technology', value: avgScores.technology, count: categoryStats.technology }
+                            ].map(cat => (
+                                <div key={cat.label}>
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginBottom: '0.5rem' }}>
+                                            {cat.label} ({cat.count})
+                                        </div>
+                                        <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-accent-blue)' }}>
+                                            {cat.value.toFixed(1)}
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        width: '100%',
+                                        height: '8px',
+                                        background: 'var(--color-bg-hover)',
+                                        borderRadius: '4px',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <div style={{
+                                            width: `${(cat.value / 100) * 100}%`,
+                                            height: '100%',
+                                            background: 'var(--color-accent-blue)',
+                                            borderRadius: '4px',
+                                            transition: 'width 0.3s ease'
+                                        }}></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // D3 Visualizations
+        const drawBarChart = (element, useCases, weights, onSelectUseCase) => {
+            if (!element || useCases.length === 0) return;
+
+            const data = useCases.slice(0, 20).map(uc => ({
+                name: uc.name,
+                score: calculateCompositeScore(uc, weights),
+                id: uc.id,
+                fullData: uc
+            })).sort((a, b) => b.score - a.score);
+
+            const margin = { top: 20, right: 30, bottom: 100, left: 40 };
+            const width = element.clientWidth - margin.left - margin.right;
+            const height = element.clientHeight - margin.top - margin.bottom;
+
+            d3.select(element).selectAll("*").remove();
+
+            const svg = d3.select(element)
+                .attr('width', element.clientWidth)
+                .attr('height', element.clientHeight);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleBand()
+                .range([0, width])
+                .padding(0.2)
+                .domain(data.map(d => d.name));
+
+            const y = d3.scaleLinear()
+                .range([height, 0])
+                .domain([0, 100]);
+
+            // Grid lines
+            g.append('g')
+                .attr('class', 'grid-lines')
+                .call(d3.axisLeft(y)
+                    .tickSize(-width)
+                    .tickFormat('')
+                )
+                .selectAll('.tick')
+                .selectAll('line')
+                .attr('class', 'grid-line');
+
+            // Define gradient
+            svg.append('defs').append('linearGradient')
+                .attr('id', 'barGradient')
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '0%')
+                .attr('y2', '100%')
+                .selectAll('stop')
+                .data([
+                    { offset: '0%', color: '#3b82f6' },
+                    { offset: '100%', color: '#8b5cf6' }
+                ])
+                .enter()
+                .append('stop')
+                .attr('offset', d => d.offset)
+                .attr('stop-color', d => d.color);
+
+            // Bars
+            g.selectAll('.bar')
+                .data(data)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar-chart-bar')
+                .attr('x', d => x(d.name))
+                .attr('y', height)
+                .attr('width', x.bandwidth())
+                .attr('height', 0)
+                .on('click', (event, d) => onSelectUseCase(d.fullData))
+                .transition()
+                .duration(800)
+                .attr('y', d => y(d.score))
+                .attr('height', d => height - y(d.score));
+
+            // X axis
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end')
+                .style('font-size', '12px')
+                .attr('class', 'axis-text');
+
+            // Y axis
+            g.append('g')
+                .call(d3.axisLeft(y))
+                .selectAll('text')
+                .attr('class', 'axis-text');
+        };
+
+        const drawRadarChart = (element, useCase) => {
+            if (!element) return;
+
+            const data = [
+                { axis: 'ROI', value: useCase.scores.roi },
+                { axis: 'Maturity', value: useCase.scores.maturity },
+                { axis: 'Adoption', value: useCase.scores.adoption },
+                { axis: 'Readiness', value: useCase.scores.readiness },
+                { axis: 'Complexity', value: 100 - useCase.scores.complexity },
+                { axis: 'Risk', value: 100 - useCase.scores.risk }
+            ];
+
+            const margin = 30;
+            const width = element.clientWidth;
+            const height = element.clientHeight;
+            const radius = Math.min(width, height) / 2 - margin;
+
+            d3.select(element).selectAll("*").remove();
+
+            const svg = d3.select(element)
+                .attr('width', width)
+                .attr('height', height);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${width / 2},${height / 2})`);
+
+            const angleSlice = (Math.PI * 2) / data.length;
+
+            // Circle backgrounds
+            for (let i = 1; i <= 5; i++) {
+                g.append('circle')
+                    .attr('r', (radius / 5) * i)
+                    .attr('class', 'grid-line')
+                    .attr('fill', 'none');
+            }
+
+            // Axes
+            g.selectAll('.axis')
+                .data(data)
+                .enter()
+                .append('line')
+                .attr('class', 'axis-line')
+                .attr('x1', 0)
+                .attr('y1', 0)
+                .attr('x2', (d, i) => radius * Math.cos(angleSlice * i - Math.PI / 2))
+                .attr('y2', (d, i) => radius * Math.sin(angleSlice * i - Math.PI / 2));
+
+            // Axis labels
+            g.selectAll('.axis-label')
+                .data(data)
+                .enter()
+                .append('text')
+                .attr('class', 'axis-text')
+                .attr('x', (d, i) => (radius + 30) * Math.cos(angleSlice * i - Math.PI / 2))
+                .attr('y', (d, i) => (radius + 30) * Math.sin(angleSlice * i - Math.PI / 2))
+                .attr('text-anchor', 'middle')
+                .attr('dy', '0.35em')
+                .text(d => d.axis);
+
+            // Data path
+            const pathPoints = data.map((d, i) => [
+                (d.value / 100) * radius * Math.cos(angleSlice * i - Math.PI / 2),
+                (d.value / 100) * radius * Math.sin(angleSlice * i - Math.PI / 2)
+            ]);
+
+            const pathString = 'M' + pathPoints.map(p => p.join(',')).join('L') + 'Z';
+
+            g.append('path')
+                .attr('d', pathString)
+                .attr('fill', 'url(#radarGradient)')
+                .attr('fill-opacity', 0.5)
+                .attr('stroke', '#3b82f6')
+                .attr('stroke-width', 2);
+
+            // Add gradient for radar
+            svg.append('defs').append('linearGradient')
+                .attr('id', 'radarGradient')
+                .attr('x1', '0%')
+                .attr('x2', '0%')
+                .attr('y1', '0%')
+                .attr('y2', '100%')
+                .selectAll('stop')
+                .data([
+                    { offset: '0%', color: '#3b82f6' },
+                    { offset: '100%', color: '#8b5cf6' }
+                ])
+                .enter()
+                .append('stop')
+                .attr('offset', d => d.offset)
+                .attr('stop-color', d => d.color);
+
+            // Data points
+            g.selectAll('.data-point')
+                .data(pathPoints)
+                .enter()
+                .append('circle')
+                .attr('cx', d => d[0])
+                .attr('cy', d => d[1])
+                .attr('r', 4)
+                .attr('fill', '#3b82f6');
+        };
+
+        // Render App
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
